@@ -3,7 +3,6 @@ import json
 from Item import Item
 from Production import Production
 
-# TODO: Create a class for epsilon instead of using the empty tuple?
 def load_productions_from_json(path: str, debug: bool=False, tabs: int=0) -> dict:
     """Loads a dictionary of productions from a json file.
 
@@ -28,8 +27,7 @@ def load_productions_from_json(path: str, debug: bool=False, tabs: int=0) -> dic
                     print(f"{'  ' * tabs}name: {name}, result: {result}") if debug else ""
                     result = list(map(lambda x: () if x == [] else x, result))
                     production = Production(lhs, result, name)
-                    item = Item(production, 0, 0)
-                    init_items.append(item)
+                    init_items.append(production.create_init_item())
                     if lhs in productions:
                         productions[lhs].append(production)
                     else:
@@ -37,8 +35,7 @@ def load_productions_from_json(path: str, debug: bool=False, tabs: int=0) -> dic
             else:
                 rhs = list(map(lambda x: () if x == [] else x, rhs))
                 production = Production(lhs, rhs)
-                item = Item(production, 0, 0)
-                init_items.append(item)
+                init_items.append(production.create_init_item())
                 if lhs in productions:
                     productions[lhs].append(production)
                 else:
@@ -134,13 +131,13 @@ def closure_on_item(row: int, col: int, item_chart: list, symbol_chart: list, it
     item_chart[row][col].add(item)
     print(f"{'  ' * (tabs + 1)}Item added to item chart") if debug else ""
     cell_on_diagonal = symbol_chart[col][col]
-    if item.next_symbol() in cell_on_diagonal:
+    if item.get_next_symbol() in cell_on_diagonal:
         print(f"{'  ' * (tabs + 1)}Item Can Progress") if debug else ""
-        new_item = item.progress(item.next_symbol(), cell_on_diagonal[item.next_symbol()])
+        new_item = item.progress(item.get_next_symbol(), cell_on_diagonal[item.get_next_symbol()])
         if new_item.completed():
             print(f"{'  ' * (tabs + 1)}Item Completes") if debug else ""
             item_chart[row][col].add(new_item)
-            closure_on_symbol(row, col, item_chart, symbol_chart, item.production.lhs, item.metric + cell_on_diagonal[item.next_symbol()], debug=debug, tabs=tabs+2)
+            closure_on_symbol(row, col, item_chart, symbol_chart, item.production.lhs, item.metric + cell_on_diagonal[item.get_next_symbol()], debug=debug, tabs=tabs+2)
         else:
             print(f"{'  ' * (tabs + 1)}Item does not Completes") if debug else ""
             closure_on_item(row, col, item_chart, symbol_chart, new_item, debug=debug,tabs=tabs+2)
@@ -169,12 +166,12 @@ def fill_rest(n: int, symbol_chart: list, item_chart: list, debug: bool=False, t
                 for item in item_chart[item_row][item_col]:
                     print(f"{'  ' * (tabs + 4)}Item: {item}") if debug else ""
                     symbol_cell = symbol_chart[sym_row][sym_col]
-                    if item.next_symbol() in symbol_cell:
-                        new_item = item.progress(item.next_symbol(), symbol_cell[item.next_symbol()])
+                    if item.get_next_symbol() in symbol_cell:
+                        new_item = item.progress(item.get_next_symbol(), symbol_cell[item.get_next_symbol()])
                         if new_item.completed(): 
                             print(f"{'  ' * (tabs + 4)}Item Completes, adding {item.production.lhs} to symbol chart") if debug else ""
                             item_chart[row][col].add(new_item)
-                            closure_on_symbol(row, col, item_chart, symbol_chart, item.production.lhs, item.metric + symbol_cell[item.next_symbol()], debug=debug, tabs=tabs+5)
+                            closure_on_symbol(row, col, item_chart, symbol_chart, item.production.lhs, item.metric + symbol_cell[item.get_next_symbol()], debug=debug, tabs=tabs+5)
                             print(f"{'  ' * (tabs + 4)}Symbol Chart: {symbol_chart}") if debug else ""
                         else:
                             closure_on_item(row, col, item_chart, symbol_chart, new_item, debug=debug, tabs=tabs+5)

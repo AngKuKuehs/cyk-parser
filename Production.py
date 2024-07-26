@@ -8,6 +8,12 @@ class Production():
 
     def create_init_item(self):
         return Item.Item(production=self, dot=0, metric=0)
+    
+    def __hash__(self) -> int:
+        return hash((self.lhs, tuple(self.rhs), self.name))
+
+    def __eq__(self, value: object) -> bool:
+        return (self.lhs, tuple(self.rhs), self.name) == (value.lhs, value.rhs, value.name)
 
     def __repr__(self) -> str:
         if self.name:
