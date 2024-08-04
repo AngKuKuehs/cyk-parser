@@ -55,21 +55,21 @@ def parse(sentence: str, productions: dict, init_items: list, debug: bool=False,
     fill_epsilon_diagonal(n, init_items, symbol_chart, item_chart, debug=debug, tabs=tabs)
 
     if debug:
-        print(f"{'  ' * tabs}Epsilon Diagonal Filled:")
+        print(f"{'  ' * (tabs + 0)}Epsilon Diagonal Filled:")
         print(f"{'  ' * (tabs + 1)}item_chart: {item_chart}")
         print(f"{'  ' * (tabs + 1)}symbol_chart: {symbol_chart}")
 
     fill_diagonal(n, sentence, symbol_chart, item_chart, debug=debug, tabs=tabs)
 
     if debug:
-        print(f"{'  ' * tabs}First Diagonal Filled:")
+        print(f"{'  ' * (tabs + 0)}First Diagonal Filled:")
         print(f"{'  ' * (tabs + 1)}item_chart: {item_chart}")
         print(f"{'  ' * (tabs + 1)}symbol_chart: {symbol_chart}")
 
     fill_rest(n, symbol_chart, item_chart, debug=debug, tabs=tabs)
 
     if debug:
-        print(f"{'  ' * tabs}rest filled")
+        print(f"{'  ' * (tabs + 0)}rest filled")
         print(f"{'  ' * (tabs + 1)}item_chart: {item_chart}")
         print(f"{'  ' * (tabs + 1)}symbol_chart: {symbol_chart}")
 
