@@ -45,7 +45,6 @@ def load_productions_from_json(path: str, debug: bool=False, tabs: int=0) -> dic
     print(f"{'  ' * tabs}Init Items: {init_items}") if debug else ""
     return productions, init_items
 
-
 def parse(sentence: str, productions: dict, init_items: list, debug: bool=False, tabs: int=0) -> tuple:
     print(f"{'*'*30}\nParsing \"{sentence}\" with {productions}\n{'*'*30}") if debug else ""
     n = len(sentence)
@@ -56,8 +55,8 @@ def parse(sentence: str, productions: dict, init_items: list, debug: bool=False,
 
     if debug:
         print(f"{'  ' * (tabs + 0)}Epsilon Diagonal Filled:")
-        print(f"{'  ' * (tabs + 1)}item_chart: {item_chart}")
-        print(f"{'  ' * (tabs + 1)}symbol_chart: {symbol_chart}")
+        print(f"{'  ' * (tabs + 1)}Item Chart: {item_chart}")
+        print(f"{'  ' * (tabs + 1)}Symbol Chart: {symbol_chart}")
 
     fill_diagonal(n, sentence, symbol_chart, item_chart, debug=debug, tabs=tabs)
 
@@ -141,7 +140,6 @@ def closure_on_item(row: int, col: int, item_chart: list, symbol_chart: list, it
         else:
             print(f"{'  ' * (tabs + 1)}Item does not Completes") if debug else ""
             closure_on_item(row, col, item_chart, symbol_chart, new_item, debug=debug,tabs=tabs+2)
-
 
 def fill_diagonal(n: int, sentence: str, symbol_chart: list, item_chart: list, debug: bool=False, tabs: int=0) -> None:
     print(f"{'  ' * (tabs + 0)}Filling first diagonal") if debug else ""
