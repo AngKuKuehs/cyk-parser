@@ -62,15 +62,15 @@ def parse(sentence: str, productions: dict, init_items: list, debug: bool=False,
 
     if debug:
         print(f"{'  ' * (tabs + 0)}First Diagonal Filled:")
-        print(f"{'  ' * (tabs + 1)}item_chart: {item_chart}")
-        print(f"{'  ' * (tabs + 1)}symbol_chart: {symbol_chart}")
+        print(f"{'  ' * (tabs + 1)}Item Chart: {item_chart}")
+        print(f"{'  ' * (tabs + 1)}Symbol Chart: {symbol_chart}")
 
     fill_rest(n, symbol_chart, item_chart, debug=debug, tabs=tabs)
 
     if debug:
         print(f"{'  ' * (tabs + 0)}rest filled")
-        print(f"{'  ' * (tabs + 1)}item_chart: {item_chart}")
-        print(f"{'  ' * (tabs + 1)}symbol_chart: {symbol_chart}")
+        print(f"{'  ' * (tabs + 1)}Item Chart: {item_chart}")
+        print(f"{'  ' * (tabs + 1)}Symbol Chart: {symbol_chart}")
 
     return (symbol_chart, item_chart)
 
@@ -88,8 +88,8 @@ def fill_epsilon_diagonal(n: int, init_items: list, symbol_chart: list, item_cha
         symbol_chart[row][row] = symbol_cell
         item_chart[row][row] = item_cell
 
-    print(f"{'  ' * (tabs + 1)}symbol_chart: {symbol_chart}") if debug else ""
-    print(f"{'  ' * (tabs + 1)}item_chart: {item_chart}") if debug else ""
+    print(f"{'  ' * (tabs + 1)}Symbol Chart: {symbol_chart}") if debug else ""
+    print(f"{'  ' * (tabs + 1)}Item Chart: {item_chart}") if debug else ""
 
 def closure_on_symbol(row: int, col: int, item_chart: list[list[Item]],
                       symbol_chart: list[list[dict]], symbol: str, error: int, debug: bool=False, tabs: int=0) -> None:
@@ -97,6 +97,7 @@ def closure_on_symbol(row: int, col: int, item_chart: list[list[Item]],
         print(f"{'  ' * (tabs + 0)}Closure on '{symbol}' at {row}, {col}")
         print(f"{'  ' * (tabs + 1)}Symbol Chart: {symbol_chart}")
         print(f"{'  ' * (tabs + 1)}Symbol Chart Cell: {symbol_chart[row][col]}")
+        print(f"{'  ' * (tabs + 1)}Item Chart: {item_chart}") if debug else ""
 
     if symbol in symbol_chart[row][col]:
         print(f"{'  ' * (tabs + 1)}symbol in cell already") if debug else ""
@@ -122,6 +123,7 @@ def closure_on_item(row: int, col: int, item_chart: list, symbol_chart: list, it
         print(f"{'  ' * (tabs + 0)}Closure on '{item}' at {row}, {col}")
         print(f"{'  ' * (tabs + 1)}Item Chart: {item_chart}")
         print(f"{'  ' * (tabs + 1)}Item Chart Cell: {item_chart[row][col]}")
+        print(f"{'  ' * (tabs + 1)}Symbol Chart: {symbol_chart}")
 
     if item in item_chart[row][col]:
         print(f"{'  ' * (tabs + 1)}Item in item chart") if debug else ""
@@ -171,7 +173,9 @@ def fill_rest(n: int, symbol_chart: list, item_chart: list, debug: bool=False, t
                             item_chart[row][col].add(new_item)
                             closure_on_symbol(row, col, item_chart, symbol_chart, item.production.lhs, item.metric + symbol_cell[item.get_next_symbol()], debug=debug, tabs=tabs+5)
                             print(f"{'  ' * (tabs + 4)}Symbol Chart: {symbol_chart}") if debug else ""
+                            print(f"{'  ' * (tabs + 4)}Item Chart: {item_chart}") if debug else ""
                         else:
                             closure_on_item(row, col, item_chart, symbol_chart, new_item, debug=debug, tabs=tabs+5)
                             print(f"{'  ' * (tabs + 4)}Item progressing, adding {new_item} to item chart") if debug else ""
                             print(f"{'  ' * (tabs + 4)}Item Chart: {item_chart}") if debug else ""
+                            print(f"{'  ' * (tabs + 4)}Symbol Chart: {symbol_chart}") if debug else ""
