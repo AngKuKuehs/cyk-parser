@@ -53,33 +53,12 @@ with item_col:
         item_html = tabulate(st.session_state.item_charts[st.session_state.item_index], tablefmt="html")
         st.markdown(item_html.replace("],", "]\n\n"),unsafe_allow_html=True)
 
-    # if st.button("next"):
-    #     st.session_state.item_index = (st.session_state.item_index + 1) % len(st.session_state.item_charts)
-    
-    # if st.button("prev"):
-    #     st.session_state.item_index = (st.session_state.item_index - 1) % len(st.session_state.item_charts)
-    
-    # if new_value := st.selectbox("Select Item Chart", options=range(len(st.session_state.item_charts))):
-    #     st.session_state.item_index = new_value
-    # st.button("confirm")
-
-
 with symbol_col:
     st.subheader(f"symbol chart {st.session_state.symbol_index}")
     symbol_cont = st.container(height=600)
     with symbol_cont:
         symbol_html = tabulate(st.session_state.symbol_charts[st.session_state.symbol_index], tablefmt="html")
         st.markdown(symbol_html.replace("],", "]\n\n"),unsafe_allow_html=True)
-
-    # if st.button("next", key="sym_nxt"):
-    #     st.session_state.symbol_index = (st.session_state.symbol_index + 1) % len(st.session_state.symbol_charts)
-    
-    # if st.button("prev", key="sym_prev"):
-    #     st.session_state.symbol_index = (st.session_state.symbol_index - 1) % len(st.session_state.symbol_charts)
-    
-    # if new_value := st.selectbox("Select Symbol Chart", options=range(len(st.session_state.symbol_charts)), key="sym_sel"):
-    #     st.session_state.symbol_index = new_value
-    # st.button("confirm", key="sym_confirm")
 
 if st.button("next", key="all_nxt"):
     st.session_state.item_index = st.session_state.symbol_index = (st.session_state.symbol_index + 1) % len(st.session_state.symbol_charts)
