@@ -7,7 +7,7 @@ class Production():
         self.name = name
 
     def create_init_item(self):
-        return Item.Item(production=self, dot=0, metric=0)
+        return Item.Item(production=self, dot=0)
     
     def __hash__(self) -> int:
         return hash((self.lhs, tuple(self.rhs), self.name))

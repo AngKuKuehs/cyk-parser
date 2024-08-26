@@ -1,10 +1,9 @@
 from Production import Production
 #TODO: Remove metric from here, have it in item chart instead
 class Item():
-    def __init__(self, production: Production, dot: int, metric: int): # does hash 
+    def __init__(self, production: Production, dot: int): # does hash 
         self.production = production # contains lhs, rhs, and name
         self.dot = dot
-        self.metric = metric
 
     def completed(self):
         "Returns True if item is completed, False otherwise."
@@ -16,9 +15,9 @@ class Item():
         else:
             return None
 
-    def progress(self, symbol, metric):
+    def progress(self, symbol):
         if symbol == self.get_next_symbol():
-            return Item(self.production, self.dot + 1, self.metric + metric)
+            return Item(self.production, self.dot + 1)
         else:
             return None
 
