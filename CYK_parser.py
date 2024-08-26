@@ -1,7 +1,7 @@
 import json
 
-from Item import Item
-from Production import Production
+from item import Item
+from production import Production
 
 def load_productions_from_json(path: str, debug: bool=False, tabs: int=0) -> dict:
     """Loads a dictionary of productions from a json file.

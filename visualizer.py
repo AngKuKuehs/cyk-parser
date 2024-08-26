@@ -6,7 +6,7 @@ import contextlib
 import streamlit as st
 from tabulate import tabulate
 
-from CYK_parser import load_productions_from_json, parse
+from cyk_parser import load_productions_from_json, parse
 
 st.set_page_config(layout="wide", page_title="Chart Viewer")
 st.title("Chart Viewer")

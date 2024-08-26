@@ -1,4 +1,4 @@
-import Item
+import item
 
 class Production():
     def __init__(self, lhs: str, rhs: list, name=None):
@@ -7,7 +7,7 @@ class Production():
         self.name = name
 
     def create_init_item(self):
-        return Item.Item(production=self, dot=0)
+        return item.Item(production=self, dot=0)
     
     def __hash__(self) -> int:
         return hash((self.lhs, tuple(self.rhs), self.name))

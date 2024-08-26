@@ -1,4 +1,4 @@
-from Production import Production
+from production import Production
 #TODO: Remove metric from here, have it in item chart instead
 class Item():
     def __init__(self, production: Production, dot: int): # does hash 
