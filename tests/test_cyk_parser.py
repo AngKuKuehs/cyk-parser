@@ -1,6 +1,5 @@
-import sys
 
-from CYK_parser import load_productions_from_json, parse
+from cyk_parser import load_productions_from_json, parse
 
 productions_1, init_items_1 = load_productions_from_json("grammars/simple_CNF_grammar.json")
 productions_2, init_items_2 = load_productions_from_json("grammars/simple_nonCNF_grammar.json")
