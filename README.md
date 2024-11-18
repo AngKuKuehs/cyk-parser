@@ -1,15 +1,34 @@
 # CYK-Parser
-Python Implementation of an error-correcting CYK parsern with items and error metrics.
+Python Implementation of an error-correcting CYK parser with items and error metrics.
+
+## Grammar Schema
+Each grammar taken in by the parser must be written in a JSON format.
+
+This format is a dictionary where the key is the starting symbol of a production while the value is a list whose first element is a dictionary of named productions (key: production name, value: prodcution result) and whose subsequent elements are a list of unnamed production results.
+
+Production results are always stored in a list where each element of that list is a symbol of the result.
+
+The empty string is represented by []
+
+e.g.:
+```
+{
+    "Start": [{"rule_1": ["A", "B"], "rule_2": ["C"]}, []],
+    "A": [{"rule_3": ["B", "C"]}, ["a"]],
+    "B": [{}, ["b"]],
+    "C": [{"c_self": ["c"]}]
+}
+```
 
 ## Algorithm
 ```
-input: string of terminals s, with length of n.
-input: list of tuples of productions rules g, in the form ("A", "BC", Error Metric) for A -> BC
+input: string of terminals, s, with length of n.
+input: list of tuples of productions rules, g, in the form ("A", "BC", Error Metric) for A -> BC
 
 init a n by n by n list of list of [], item_chart, where each element is a tuple (Start, Result, State, Error Metric) e.g. (A, BC, 1, 0) for A -> B•C or 
 init a n by n list of list of n maps, symbol_chart, where each key-value pair is a parsed symbol and its corresponding error metric
 
-iterate i through through the range of 0 to n - 1:
+iterate i through through the range of 0 to n:
     add s[i] to symbol_chart[i][i]
     init a bool, add_to_symbols, and set to True
     while add_to_symbols:
