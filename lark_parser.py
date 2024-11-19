@@ -19,7 +19,7 @@ class ListLexer(Lexer):
     def lex(self, lexer_state: LexerState) -> Iterator[Token]:
         return self.tokens
 
-class LarkLexer():
+class LarkParser():
     def __init__(self):
         kwargs = dict(postlex=PythonIndenter(), start='file_input')
         self.lalr_parser = Lark.open_from_package('lark', 'python.lark', ['grammars'], parser="lalr", **kwargs)
@@ -39,6 +39,7 @@ class LarkLexer():
         tokens = [token for token in stream]
         for token in tokens:
             self.fix_underscore(token)
+        self.lexer = ListLexer(tokens)
         return list(map(lambda x: x.type, tokens))
 
     def parse(self, text):
@@ -46,7 +47,3 @@ class LarkLexer():
         kw = {}
         return self.earley_parser.parser.parser.parse(self.lexer, self.earley_parser.parser._verify_start(), **kw)
 
-if __name__ == "__main__":
-    lexer = LarkLexer()
-    tokens = lexer.lex("print('hello')\n")
-    print(tokens)
