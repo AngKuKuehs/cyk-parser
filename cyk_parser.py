@@ -135,7 +135,7 @@ def fill_epsilon_diagonal(n: int, init_items: list, symbol_chart: list, item_cha
     for row in range(n + 1):
         symbol_chart[row][row] = symbol_cell
         item_chart[row][row] = item_cell
-    print(symbol_chart[0][0])
+
     print(f"{'  ' * (tabs + 1)}Symbol Chart: {symbol_chart}") if debug else ""
     print(f"{'  ' * (tabs + 1)}Item Chart: {item_chart}") if debug else ""
 
