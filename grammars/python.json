@@ -3,7 +3,7 @@
         [
             "__file_input_star_0"
         ],
-        []
+        [[]]
     ],
     "decorator": [
         [
@@ -288,7 +288,7 @@
             "COMMA",
             "kwparams"
         ],
-        []
+        [[]]
     ],
     "kwparams": [
         [
@@ -952,7 +952,7 @@
         [
             "__elifs_star_13"
         ],
-        []
+        [[]]
     ],
     "elif_": [
         [
@@ -1337,7 +1337,7 @@
         [
             "sequence_item_pattern"
         ],
-        []
+        [[]]
     ],
     "sequence_item_pattern": [
         [
