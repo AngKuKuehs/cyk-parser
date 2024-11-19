@@ -20,9 +20,9 @@ class Item():
     def progress(self, symbol, split, symbol_tree):
         if symbol == self.get_next_symbol():
             new_item = Item(self.production, self.dot + 1, split)
-            new_item.children += self.children
-            new_item.children.append(symbol_tree)
-            
+            if symbol_tree:
+                new_item.children += self.children
+                new_item.children.append(symbol_tree)
             return new_item
         else:
             return None

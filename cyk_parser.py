@@ -5,6 +5,8 @@ from lark.tree import Tree
 from item import Item
 from production import Production
 
+make_tree = True
+
 def load_productions_from_json(path: str, debug: bool=False, tabs: int=0) -> dict:
     """
     Loads a dictionary of productions from a json file.
@@ -117,7 +119,7 @@ def fill_epsilon_diagonal(n: int, init_items: list, symbol_chart: list, item_cha
         None
     """
     print(f"{'  ' * (tabs + 0)}Filling epsilon:") if debug else ""
-    
+
     # add empty string as a symbol
     print(f"{'  ' * (tabs + 1)}Adding ():") if debug else ""
     closure_on_symbol(row=0, col=0, item_chart=item_chart, symbol_chart=symbol_chart, symbol=(), item=None, error=0, debug=debug, tabs=tabs+2)
@@ -133,7 +135,7 @@ def fill_epsilon_diagonal(n: int, init_items: list, symbol_chart: list, item_cha
     for row in range(n + 1):
         symbol_chart[row][row] = symbol_cell
         item_chart[row][row] = item_cell
-
+    print(symbol_chart[0][0])
     print(f"{'  ' * (tabs + 1)}Symbol Chart: {symbol_chart}") if debug else ""
     print(f"{'  ' * (tabs + 1)}Item Chart: {item_chart}") if debug else ""
 
@@ -167,14 +169,17 @@ def closure_on_symbol(row: int, col: int, item_chart: list[list[Item]],
         print(f"{'  ' * (tabs + 1)}symbol in cell already") if debug else ""
         return
 
-    # TODO: add tree here!, if item is None, that means we're at the sentence! tree with only data
-    if item == None:
-        symbol_tree = Tree(data=symbol, children=[])
-        # print(symbol_tree)
+    if make_tree:
+        if item == None:
+            symbol_tree = Tree(data=symbol, children=[])
+            # print(symbol_tree)
+        else:
+            symbol_tree = Tree(data=symbol, children=item.children)
     else:
-        symbol_tree = Tree(data=symbol, children=item.children)
+        symbol_tree = None
 
     symbol_chart[row][col][symbol] = (error, symbol_tree)
+
     # generate list of productions from the epsilon diagonal that could progress
     new_items = dict(filter(lambda x: x[0] is not None, 
                             (map(lambda prev_item: (prev_item[0].progress(symbol, ((row, row), (row, col)), symbol_tree), prev_item[1] + error),
@@ -187,7 +192,7 @@ def closure_on_symbol(row: int, col: int, item_chart: list[list[Item]],
         print(f"{'  ' * (tabs + 3)}Item completed: {item.completed()}") if debug else ""
         if item.completed(): # should just call closure on item, that will deal with the item being completed
             print(f"{'  ' * (tabs + 3)}Completes") if debug else ""
-            # item_chart[row][col][item] = item_error # TODO: what if item already in chart? this should be taken out and we should do a closure on the item
+            # TODO: what if item already in chart? this should be taken out and we should do a closure on the item
             closure_on_item(row, col, item_chart, symbol_chart, item, error=item_error, debug=debug, tabs=tabs+4) # this line is new
             closure_on_symbol(row, col, item_chart, symbol_chart, symbol=item.production.lhs, item=item, error=item_error, debug=debug, tabs=tabs+4)
         else:
@@ -223,8 +228,6 @@ def closure_on_item(row: int, col: int, item_chart: list, symbol_chart: list, it
         print(f"{'  ' * (tabs + 1)}Item in item chart") if debug else ""
         # TODO: check if error is less and update? then i'd need to recheck everything?
         return
-
-    # if the item i am trying to add is completed call closure on symbol
 
     # add item to item chart
     item_chart[row][col][item] = error
