@@ -57,7 +57,7 @@ def load_productions_from_json(path: str, debug: bool=False, tabs: int=0) -> dic
     print(f"{'  ' * tabs}Init Items: {init_items}") if debug else ""
     return productions, init_items
 
-def parse(sentence: str, productions: dict, init_items: list, debug: bool=False, tabs: int=0, make_tree: bool=False) -> tuple:
+def parse(sentence: str, productions: dict, init_items: list, debug: bool=False, tabs: int=0) -> tuple:
     """
     Parses a string according to the provided productions and returns the corresponding symbol chart and item chart.
 
@@ -171,8 +171,10 @@ def closure_on_symbol(row: int, col: int, item_chart: list[list[Item]],
 
     if make_tree:
         if item == None:
-            symbol_tree = Tree(data=symbol, children=[])
-            # print(symbol_tree)
+            if symbol == ():
+                symbol_tree = Tree(data="None", children=[])
+            else:
+                symbol_tree = Tree(data=symbol, children=[])
         else:
             symbol_tree = Tree(data=symbol, children=item.children)
     else:
@@ -236,10 +238,12 @@ def closure_on_item(row: int, col: int, item_chart: list, symbol_chart: list, it
     cell_on_diagonal = symbol_chart[col][col]
 
     # check if item can progress on the spot, perform closure if so
+    # TODO: add empty string to tree in this case??
     next_symbol = item.get_next_symbol()
     if next_symbol in cell_on_diagonal:
         print(f"{'  ' * (tabs + 1)}Item Can Progress") if debug else ""
-        symbol_tree = cell_on_diagonal[next_symbol][1] 
+        symbol_tree = cell_on_diagonal[next_symbol][1]
+
         new_item = item.progress(next_symbol, split=((row, col), (col, col)), symbol_tree=symbol_tree)
         new_item_error = error + cell_on_diagonal[next_symbol][0]
         if new_item.completed():

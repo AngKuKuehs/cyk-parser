@@ -5,7 +5,7 @@ class Item():
         self.production = production # contains lhs, rhs, and name
         self.dot = dot
         self.split = split
-        self.children = [] # add symbols which progress item here
+        self.children = [] # list of symbol trees, the roots of which progress this item in order
 
     def completed(self):
         "Returns True if item is completed, False otherwise."

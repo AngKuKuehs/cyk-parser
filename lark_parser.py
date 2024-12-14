@@ -5,9 +5,14 @@ from lark import Lark
 from lark.indenter import PythonIndenter
 from lark.lexer import LexerState, Lexer, Token
 
+from utils import read
+
 kwargs = dict(postlex=PythonIndenter(), start='file_input')
+kwargs["maybe_placeholders"] = False
 lalr_parser = Lark.open_from_package('lark', 'python.lark', ['grammars'], parser="lalr", **kwargs)
-combined_parser = Lark.open_from_package('lark', 'python.lark', ['grammars'], parser="earley", **kwargs) 
+# combined_parser = Lark.open_from_package('lark', 'python.lark', ['grammars'], parser="earley", **kwargs)
+# combined_parser = Lark(read("references/python-pinned.lark"), parser="earley", **kwargs) # pinned grammar
+combined_parser = Lark(read("references/python-pinned-unnamed.lark"), parser="earley", **kwargs) # pinned unnamed grammar
 
 class ListLexer(Lexer):
     def __init__(self, tokens: Iterator[Token]):
@@ -23,7 +28,8 @@ class LarkParser():
     def __init__(self):
         kwargs = dict(postlex=PythonIndenter(), start='file_input')
         self.lalr_parser = Lark.open_from_package('lark', 'python.lark', ['grammars'], parser="lalr", **kwargs)
-        self.earley_parser = Lark.open_from_package('lark', 'python.lark', ['grammars'], parser="earley", **kwargs)
+        # self.earley_parser = Lark.open_from_package('lark', 'python.lark', ['grammars'], parser="earley", **kwargs)
+        self.earley_parser = combined_parser # use pinned grammar that has does not trim trees
 
     def read(self, fn, *args):
         kwargs = {'encoding': 'iso-8859-1'}
