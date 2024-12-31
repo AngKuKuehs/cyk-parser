@@ -1,0 +1,50 @@
+import sys
+import time
+
+from cyk_parser import load_productions_from_json, parse
+from lark_parser import LarkParser
+from lark.tree import Tree
+from utils import *
+
+parser = LarkParser()
+
+python_productions, init_items_python = load_productions_from_json("grammars/python.json", debug=False)
+
+# generate parse trees for python std library
+def cmp_file(file_path):
+    file_name = file_path.split("/")[-1][:-3]
+
+    # generate tree from lark
+    lark_tree = None
+    try:
+        lark_start = time.time()
+        lark_tree = parser.parse(read(file_path) + "\n")
+        lark_end = time.time()
+        print(f"lark parsed in {lark_end - lark_start}")
+        lark_tree = convert_lark_tree(lark_tree)
+        lark_tree = Tree(lark_tree.data, trim_children(lark_tree.children))
+        save_tree(lark_tree, path=f"./outputs/trees/cmp_file/{file_name[:-3]}_tree_lark")
+    except Exception as e:
+        print(f"lark: {file_name} failed: {e}")
+
+    # generate tree from own parser
+    cyk_tree = None
+    try:
+        tokens = parser.lex(read(file_path) + "\n")
+        cyk_start = time.time()
+        symbol_chart, _ = parse(tokens, python_productions, init_items_python)
+        cyk_end = time.time()
+        print(f"cyk parsed in {cyk_end - cyk_start}")
+        cyk_tree = symbol_chart[0][-1]["file_input"][1]
+        cyk_tree = Tree(cyk_tree.data, trim_children(cyk_tree.children))
+        save_tree(cyk_tree, path=f"./outputs/trees/cmp_file/{file_name[:-3]}_tree")
+    except Exception as e:
+        print(f"cyk: {file_name} failed: {e}")
+
+    # ensure trees are equal
+    assert(lark_tree == cyk_tree)
+    print("trees equal")
+
+if __name__ == "__main__":
+    file_path = sys.argv[1]
+    cmp_file(file_path)
