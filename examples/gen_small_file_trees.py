@@ -18,10 +18,10 @@ def generate_small_file_trees():
         # generate tree from lark
         lark_tree = None
         try:
-            lark_tree = parser.parse(read(file_path))
+            lark_tree = parser.parse(read(file_path) + "\n")
             lark_tree = convert_lark_tree(lark_tree)
             lark_tree = Tree(lark_tree.data, trim_children(lark_tree.children))
-            save_tree(lark_tree, path=f"./outputs/trees/tmp/{file_name[:-3]}_tree_lark")
+            save_tree(lark_tree, path=f"./outputs/trees/small_files/{file_name[:-3]}_tree_lark")
         except Exception as e:
             print(f"lark: {file_name} failed: {e}")
 
@@ -32,7 +32,7 @@ def generate_small_file_trees():
             symbol_chart, _ = parse(tokens, python_productions, init_items_python)
             cyk_tree = symbol_chart[0][-1]["file_input"][1]
             cyk_tree = Tree(cyk_tree.data, trim_children(cyk_tree.children))
-            save_tree(cyk_tree, path=f"./outputs/trees/tmp/{file_name[:-3]}_tree")
+            save_tree(cyk_tree, path=f"./outputs/trees/small_files/{file_name[:-3]}_tree")
         except Exception as e:
             print(f"cyk: {file_name} failed: {e}")
 

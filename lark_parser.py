@@ -9,6 +9,7 @@ from utils import read
 
 kwargs = dict(postlex=PythonIndenter(), start='file_input')
 kwargs["maybe_placeholders"] = False
+kwargs["keep_all_tokens"] = True
 lalr_parser = Lark.open_from_package('lark', 'python.lark', ['grammars'], parser="lalr", **kwargs)
 # combined_parser = Lark.open_from_package('lark', 'python.lark', ['grammars'], parser="earley", **kwargs)
 # combined_parser = Lark(read("references/python-pinned.lark"), parser="earley", **kwargs) # pinned grammar

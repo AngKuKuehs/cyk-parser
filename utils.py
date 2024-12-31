@@ -1,3 +1,6 @@
+import os
+from charset_normalizer import detect
+
 import graphviz
 from lark.tree import Tree
 from lark.lexer import Token
@@ -14,15 +17,14 @@ def trim_children(children):
     """
     trimmed_children = []
     for tree in children:
-        if isinstance(tree, Tree):
-            trim = trim_children(tree.children)
-            if tree.data[0:2] == "__" or tree.data == "None" or tree.data == "_exprlist":
-                trimmed_children += trim_children(tree.children)
-            else:
-                trimmed_children.append(Tree(tree.data, trim))
-        elif isinstance(tree, str):
-            if tree[0:2] != "__" and tree != "None" and tree !="_exprlist":
-                trimmed_children.append(tree)
+        parent_val = tree.data
+        if parent_val.endswith("}"):
+            parent_val = parent_val.split("{")[0]
+        trim = trim_children(tree.children)
+        if parent_val.startswith("__") or parent_val == "None" or (parent_val.startswith("_") and not parent_val[1].isupper()):
+            trimmed_children += trim
+        else:
+            trimmed_children.append(Tree(parent_val, trim))
     return trimmed_children
 
 def __strip_token(tkn):
@@ -88,3 +90,24 @@ def save_tree(tree, path):
 
     # write tree to file
     dot.render(path)
+
+def get_files_from_dir(directory):
+    all_files = []    
+    for subdir, _, files in os.walk(directory):
+        for file_name in files:
+            if file_name[-3:] != ".py":
+                continue
+            file_path = os.path.join(subdir, file_name)
+            try:
+                with open(file_path, "rb") as file:
+                    raw_data = file.read()
+                    detected = detect(raw_data)
+                    encoding = detected["encoding"]
+                with open(file_path, encoding=encoding) as file:
+                    num_lines = sum(1 for _ in file)
+                
+                all_files.append((file_name, file_path, num_lines))
+            except Exception as e:
+                print(f"Failed to read {file_path}: {e}")
+    
+    return all_files
