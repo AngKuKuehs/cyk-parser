@@ -17,27 +17,32 @@ def cmp_file(file_path):
     # generate tree from lark
     lark_tree = None
     try:
+        tokens = parser.lex(read(file_path) + "\n")
+
         lark_start = time.time()
-        lark_tree = parser.parse(read(file_path) + "\n")
+        lark_tree = parser.parse_from_tokens(tokens)
         lark_end = time.time()
         print(f"lark parsed in {lark_end - lark_start}")
+
         lark_tree = convert_lark_tree(lark_tree)
         lark_tree = Tree(lark_tree.data, trim_children(lark_tree.children))
-        save_tree(lark_tree, path=f"./outputs/trees/cmp_file/{file_name[:-3]}_tree_lark")
+        save_tree(lark_tree, path=f"./outputs/trees/cmp_file/{file_name}_tree_lark")
     except Exception as e:
         print(f"lark: {file_name} failed: {e}")
 
     # generate tree from own parser
     cyk_tree = None
     try:
-        tokens = parser.lex(read(file_path) + "\n")
+        tokens = convert_lark_tokens_for_cyk(parser.lex(read(file_path) + "\n"))
+
         cyk_start = time.time()
         symbol_chart, _ = parse(tokens, python_productions, init_items_python)
         cyk_end = time.time()
         print(f"cyk parsed in {cyk_end - cyk_start}")
+
         cyk_tree = symbol_chart[0][-1]["file_input"][1]
         cyk_tree = Tree(cyk_tree.data, trim_children(cyk_tree.children))
-        save_tree(cyk_tree, path=f"./outputs/trees/cmp_file/{file_name[:-3]}_tree")
+        save_tree(cyk_tree, path=f"./outputs/trees/cmp_file/{file_name}_tree")
     except Exception as e:
         print(f"cyk: {file_name} failed: {e}")
 
