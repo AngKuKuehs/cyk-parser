@@ -57,7 +57,7 @@ def load_productions_from_json(path: str, debug: bool=False, tabs: int=0) -> dic
     print(f"{'  ' * tabs}Init Items: {init_items}") if debug else ""
     return productions, init_items
 
-def parse(sentence: str, productions: dict, init_items: list, debug: bool=False, tabs: int=0) -> tuple:
+def parse(sentence: str, productions: dict, init_items: list, init_error: int=0, debug: bool=False, tabs: int=0) -> tuple:
     """
     Parses a string according to the provided productions and returns the corresponding symbol chart and item chart.
 
@@ -78,8 +78,6 @@ def parse(sentence: str, productions: dict, init_items: list, debug: bool=False,
     item_chart = [[{} for _ in range(n + 1)] for _ in range(n + 1)] # key: item, value: error metric
     symbol_chart = [[{} for _ in range(n + 1)] for _ in range(n + 1)] # key: symbol, value: error metric, tree
 
-    #TODO: check how much memory/time above takes, return early
-
     fill_epsilon_diagonal(n, init_items, symbol_chart, item_chart, debug=debug, tabs=tabs)
 
     if debug:
@@ -87,7 +85,7 @@ def parse(sentence: str, productions: dict, init_items: list, debug: bool=False,
         print(f"{'  ' * (tabs + 1)}Item Chart: {item_chart}")
         print(f"{'  ' * (tabs + 1)}Symbol Chart: {symbol_chart}")
 
-    fill_diagonal(n, sentence, symbol_chart, item_chart, debug=debug, tabs=tabs)
+    fill_diagonal(n, sentence, symbol_chart, item_chart, init_error=init_error, debug=debug, tabs=tabs)
 
     if debug:
         print(f"{'  ' * (tabs + 0)}First Diagonal Filled:")
@@ -255,7 +253,7 @@ def closure_on_item(row: int, col: int, item_chart: list, symbol_chart: list, it
             print(f"{'  ' * (tabs + 1)}Item does not Completes") if debug else ""
             closure_on_item(row, col, item_chart, symbol_chart, item=new_item, error=new_item_error, debug=debug, tabs=tabs+2)
 
-def fill_diagonal(n: int, sentence: str, symbol_chart: list, item_chart: list, debug: bool=False, tabs: int=0) -> None:
+def fill_diagonal(n: int, sentence: str, symbol_chart: list, item_chart: list, init_error: int=0, debug: bool=False, tabs: int=0) -> None:
     """
     Fill in the first diagonal after the epsilon diagonal of the symbol and 
     item charts inplace. This is done by putting the initial symbols from
@@ -276,7 +274,8 @@ def fill_diagonal(n: int, sentence: str, symbol_chart: list, item_chart: list, d
     for row in range(n):
         col = row + 1
         symbol = sentence[row]
-        closure_on_symbol(row, col, item_chart, symbol_chart, symbol, item=None, error=0, debug=debug, tabs=tabs+1)
+
+        closure_on_symbol(row, col, item_chart, symbol_chart, symbol, item=None, error=init_error, debug=debug, tabs=tabs+1)
 
 def fill_rest(n: int, symbol_chart: list, item_chart: list, debug: bool=False, tabs: int=0) -> None:
     """
