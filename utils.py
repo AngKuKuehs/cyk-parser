@@ -111,3 +111,6 @@ def get_files_from_dir(directory):
                 print(f"Failed to read {file_path}: {e}")
     
     return all_files
+
+def convert_lark_tokens_for_cyk(tokens):
+    return list(map(lambda x: x.type, tokens))
