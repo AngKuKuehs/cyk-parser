@@ -8,16 +8,45 @@ class Item():
         self.children = [] # list of symbol trees, the roots of which progress this item in order
 
     def completed(self):
-        "Returns True if item is completed, False otherwise."
+        """
+        Checks if this instance of the Item has been completed.
+
+        Parameters:
+            self (Item): instance of Item
+
+        Returns:
+            Bool: True if this item is completed, False otherwise
+        """
         return self.dot == len(self.production.rhs)
     
     def get_next_symbol(self):
+        """
+        Gets the next symbol needed to progress this instance of Item. Returns None if item is completed.
+
+        Parameters:
+            self (Item): instance of Item
+
+        Returns:
+            str | None: Returns next symbol as a string or None if the item is completed.
+        """
         if self.dot < len(self.production.rhs):
             return self.production.rhs[self.dot]
         else:
             return None
 
     def progress(self, symbol, split, symbol_tree):
+        """
+        Progresses the item if the string provided is matches the next symbol needed to progress the item.
+
+        Parameters:
+            self (Item): instance of Item
+            symbol (str): the symbol which may progress the item
+            split (tuple[tuple[int, int], tuple[int, int]]): row and col of the item and symbol which last progressed it respectively
+            symbol_tree (Tree | None): symbol tree of symbol param or None if make_tree is False
+
+        Returns:
+            str | None: Returns next symbol as a string or None if the item is completed.
+        """
         if symbol == self.get_next_symbol():
             new_item = Item(self.production, self.dot + 1, split)
             if symbol_tree:
