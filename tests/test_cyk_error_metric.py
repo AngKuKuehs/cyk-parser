@@ -45,6 +45,7 @@ def test_parser_on_gramamr_5():
 def test_parser_on_python_grammar():
     parser = LarkParser()
     tokens = parser.lex(read("references/python-3.0-library/encodings/ascii.py") + "\n")
+    tokens = convert_lark_tokens_for_cyk(tokens)
     assert(parse(tokens, python_productions, init_items_python, init_error=1))[0][0][-1]["file_input"][0] == len(tokens)
 
 test_parser_on_grammar_1()
