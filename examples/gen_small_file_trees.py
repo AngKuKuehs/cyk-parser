@@ -28,7 +28,7 @@ def generate_small_file_trees():
         # generate tree from own parser
         cyk_tree = None
         try:
-            tokens = parser.lex(read(file_path) + "\n")
+            tokens = convert_lark_tokens_for_cyk(parser.lex(read(file_path) + "\n"))
             symbol_chart, _ = parse(tokens, python_productions, init_items_python)
             cyk_tree = symbol_chart[0][-1]["file_input"][1]
             cyk_tree = Tree(cyk_tree.data, trim_children(cyk_tree.children))
