@@ -13,7 +13,7 @@ if __name__ == "__main__":
     small_file_single_deletion_errors = create_test_set_all_files(add_single_deletion_error, small_file_token_dict)
     small_file_single_insertion_errors = create_test_set_all_files(add_single_insertion_error, small_file_token_dict)
 
-    ver = 0
+    ver = 1
     # save error files
     save_error_file(single_deletion_errors, f"std_lib_single_deletion-{ver}-20")
     save_error_file(single_insertion_errors, f"std_lib_single_insertion-{ver}-20")
@@ -22,6 +22,7 @@ if __name__ == "__main__":
     save_error_file(small_file_single_insertion_errors, f"small_file_single_insertion-{ver}-20")
 
     # check that files match
+    # we are saving files as a list of Tokens (from Lark) so pickle is preferable to json
     single_deletion_errors_loaded = load_error_file(f"references/error_test_set/std_lib_single_deletion-{ver}-20.pkl")
     single_insertion_errors_loaded = load_error_file(f"references/error_test_set/std_lib_single_insertion-{ver}-20.pkl")
 
