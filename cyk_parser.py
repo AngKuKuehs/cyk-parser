@@ -4,6 +4,7 @@ from lark.tree import Tree
 
 from item import Item
 from production import Production
+from error_combiners import simple_del_addition, simple_ins_addition, simple_prog_addition
 
 make_tree = True
 
@@ -57,7 +58,17 @@ def load_productions_from_json(path: str, debug: bool=False, tabs: int=0) -> dic
     print(f"{'  ' * tabs}Init Items: {init_items}") if debug else ""
     return productions, init_items
 
-def parse(sentence: str, productions: dict, init_items: list, init_error: int=0, error_correct: bool=False, debug: bool=False, tabs: int=0) -> tuple:
+error_config = {
+    "error_correct": False,
+    "init_error": 0,
+    "del_error_combiner": simple_del_addition,
+    "ins_error_combiner": simple_ins_addition,
+    "progress_error_combiner": simple_prog_addition,
+    "init_ins_error": 1,
+    "error_limit": 1
+}
+
+def parse(sentence: str, productions: dict, init_items: list, error_config=error_config, debug: bool=False, tabs: int=0) -> tuple:
     """
     Parses a string according to the provided productions and returns the corresponding symbol chart and item chart.
 
@@ -65,13 +76,24 @@ def parse(sentence: str, productions: dict, init_items: list, init_error: int=0,
         sentence (str): The text to parse.
         productions (dict[str, list[Production]]): dictionary of productions
         init_items (list[Item]): list of items (partially completed productions)
-        error_correct (bool): whether or not to error_correct
+        error_config (dict):
+            error_correct (bool): whether or not to error_correct
+            init_error (int): initial error given terminals symbols in string
+            del_error_combiner (callable): function that combines errors when del occurs
+            ins_error_combiner (callable): function that combines errors when ins occurs
+            progress_error_combiner (callable): function that combines errors when item is progressed normally
+            init_ins_error (int): initial error given to inserted symbols in epsilon diagonal
+            error_limit (int): skips items and symbols with errors greater than this
         debug (bool): whether or not to print a debug trace
         tabs (int): indentation for debug trace
 
     Returns:
         tuple:
             symbol_chart (list[list[dict[str, tuple(int, Tree)]]]): chart of symbols after parsing
+                key: string repr of symbol
+                value:
+                    0: error metric
+                    1: tree the symbol is the root node of
             item_chart (list[list[dict[item, int]]]): chart of items after parsing
     """
     print(f"{'*'*30}\nParsing \"{sentence}\" with {productions}\n{'*'*30}") if debug else ""
@@ -79,21 +101,22 @@ def parse(sentence: str, productions: dict, init_items: list, init_error: int=0,
     item_chart = [[{} for _ in range(n + 1)] for _ in range(n + 1)] # key: item, value: error metric
     symbol_chart = [[{} for _ in range(n + 1)] for _ in range(n + 1)] # key: symbol, value: error metric, tree
 
-    fill_epsilon_diagonal(n, init_items, symbol_chart, item_chart, error_correct=error_correct, debug=debug, tabs=tabs)
+    # TODO: make initial insertion error variable
+    fill_epsilon_diagonal(n, init_items, symbol_chart, item_chart, error_config=error_config, debug=debug, tabs=tabs)
 
     if debug:
         print(f"{'  ' * (tabs + 0)}Epsilon Diagonal Filled:")
         print(f"{'  ' * (tabs + 1)}Item Chart: {item_chart}")
         print(f"{'  ' * (tabs + 1)}Symbol Chart: {symbol_chart}")
 
-    fill_diagonal(n, sentence, symbol_chart, item_chart, init_error=init_error, debug=debug, tabs=tabs)
+    fill_diagonal(n, sentence, symbol_chart, item_chart, error_config=error_config, debug=debug, tabs=tabs)
 
     if debug:
         print(f"{'  ' * (tabs + 0)}First Diagonal Filled:")
         print(f"{'  ' * (tabs + 1)}Item Chart: {item_chart}")
         print(f"{'  ' * (tabs + 1)}Symbol Chart: {symbol_chart}")
 
-    fill_rest(n, symbol_chart, item_chart, error_correct=error_correct, debug=debug, tabs=tabs)
+    fill_rest(n, symbol_chart, item_chart, error_config=error_config, debug=debug, tabs=tabs)
 
     if debug:
         print(f"{'  ' * (tabs + 0)}rest filled")
@@ -102,7 +125,7 @@ def parse(sentence: str, productions: dict, init_items: list, init_error: int=0,
 
     return (symbol_chart, item_chart)
 
-def fill_epsilon_diagonal(n: int, init_items: list, symbol_chart: list, item_chart: list, error_correct: bool=False, debug: bool=False, tabs: int=0) -> None:
+def fill_epsilon_diagonal(n: int, init_items: list, symbol_chart: list, item_chart: list, error_config=error_config, debug: bool=False, tabs: int=0) -> None:
     """
     Fill in the first diagonal of the symbol and item charts inplace.
 
@@ -111,7 +134,7 @@ def fill_epsilon_diagonal(n: int, init_items: list, symbol_chart: list, item_cha
         init_items (list[Item]): list of items (partially completed productions)
         symbol_chart (list[list[dict[str, tuple(int, Tree)]]]): chart of symbols
         item_chart (list[list[dict[item, int]]]): chart of items
-        error_correct (bool): whether or not to error_correct
+        error_config (dict): refer to parse doc string
         debug (bool): whether or not to print a debug trace
         tabs (int): indentation for debug trace
 
@@ -122,18 +145,19 @@ def fill_epsilon_diagonal(n: int, init_items: list, symbol_chart: list, item_cha
 
     # add empty string as a symbol
     print(f"{'  ' * (tabs + 1)}Adding ():") if debug else ""
-    closure_on_symbol(row=0, col=0, item_chart=item_chart, symbol_chart=symbol_chart, symbol=(), item=None, error=0, debug=debug, tabs=tabs+2)
+    closure_on_symbol(row=0, col=0, item_chart=item_chart, symbol_chart=symbol_chart, symbol=(), item=None, error=0, error_config=error_config, debug=debug, tabs=tabs+2)
 
     # add initial items and try to progress on the spot
     print(f"{'  ' * (tabs + 1)}Adding inital items:") if debug else ""
     for item in init_items:
-        closure_on_item(row=0, col=0, item_chart=item_chart, symbol_chart=symbol_chart, item=item, error=0, debug=debug, tabs=tabs+2)
-        if error_correct:
+        closure_on_item(row=0, col=0, item_chart=item_chart, symbol_chart=symbol_chart, item=item, error=0, error_config=error_config, debug=debug, tabs=tabs+2)
+        # insertion corrections:
+        if error_config["error_correct"]:
             lhs = item.production.lhs
-            closure_on_symbol(row=0, col=0, item_chart=item_chart, symbol_chart=symbol_chart, symbol=lhs, item=None, error=1, debug=debug, tabs=tabs)
+            closure_on_symbol(row=0, col=0, item_chart=item_chart, symbol_chart=symbol_chart, symbol=lhs, item=None, error=error_config["init_ins_error"], error_config=error_config, debug=debug, tabs=tabs)
             rhs_ls = item.production.rhs
             for rhs in rhs_ls:
-                closure_on_symbol(row=0, col=0, item_chart=item_chart, symbol_chart=symbol_chart, symbol=rhs, item=None, error=1, debug=debug, tabs=tabs)
+                closure_on_symbol(row=0, col=0, item_chart=item_chart, symbol_chart=symbol_chart, symbol=rhs, item=None, error=error_config["init_ins_error"], error_config=error_config, debug=debug, tabs=tabs)
 
     # copy cell to the rest of the diagonal
     symbol_cell = symbol_chart[0][0]
@@ -146,7 +170,9 @@ def fill_epsilon_diagonal(n: int, init_items: list, symbol_chart: list, item_cha
     print(f"{'  ' * (tabs + 1)}Item Chart: {item_chart}") if debug else ""
 
 def closure_on_symbol(row: int, col: int, item_chart: list[list[Item]],
-                      symbol_chart: list[list[dict]], symbol: str, item: Item, error: int, debug: bool=False, tabs: int=0) -> None:
+                      symbol_chart: list[list[dict]], symbol: str, item: Item,
+                      error: int, error_config=error_config,
+                      debug: bool=False, tabs: int=0) -> None:
     """
     Perform a closure on a symbol. This is done by checking if any new items
     can be progressed or completed given the addition of the symbol at the
@@ -158,7 +184,7 @@ def closure_on_symbol(row: int, col: int, item_chart: list[list[Item]],
         item_chart (list[list[dict[item, int]]]): chart of items
         symbol_chart (list[list[dict[str, tuple(int, Tree)]]]): chart of symbols
         symbol (str): symbol to add
-        error (int): current error metric associated with symbol
+        error_config (dict): refer to parse doc string
         debug (bool): whether or not to print a debug trace
         tabs (int): indentation for debug trace
 
@@ -171,7 +197,8 @@ def closure_on_symbol(row: int, col: int, item_chart: list[list[Item]],
         print(f"{'  ' * (tabs + 1)}Symbol Chart Cell: {symbol_chart[row][col]}")
         print(f"{'  ' * (tabs + 1)}Item Chart: {item_chart}") if debug else ""
 
-    if symbol in symbol_chart[row][col] and symbol_chart[row][col][symbol][0] < error: # TODO: What about ambigious situations?
+    # checks if a symbol with a lower error metric is in place or if error by itself is too high
+    if (symbol in symbol_chart[row][col] and symbol_chart[row][col][symbol][0] < error) or error > error_config["error_limit"]: # TODO: make 3 adjustable
         print(f"{'  ' * (tabs + 1)}symbol in cell already") if debug else ""
         return
 
@@ -188,9 +215,10 @@ def closure_on_symbol(row: int, col: int, item_chart: list[list[Item]],
 
     symbol_chart[row][col][symbol] = (error, symbol_tree)
 
-    # generate list of productions from the epsilon diagonal that could progress
+    # generate list of items from the epsilon diagonal that could progress
+    # potentially optimize by storing items as a dict with the key as the symbol that can progress it and the value as a list of items
     new_items = dict(filter(lambda x: x[0] is not None, 
-                            (map(lambda prev_item: (prev_item[0].progress(symbol, ((row, row), (row, col)), symbol_tree), prev_item[1] + error),
+                            (map(lambda prev_item: (prev_item[0].progress(symbol, ((row, row), (row, col)), symbol_tree), prev_item[1] + error),  # TODO: Think about how to handle error metric combination here!
                                  item_chart[row][row].items()))))
     print(f"{'  ' * (tabs + 1)}New items from closure: {new_items}") if debug else ""
 
@@ -200,13 +228,16 @@ def closure_on_symbol(row: int, col: int, item_chart: list[list[Item]],
         print(f"{'  ' * (tabs + 3)}Item completed: {item.completed()}") if debug else ""
         if item.completed(): # should just call closure on item, that will deal with the item being completed
             print(f"{'  ' * (tabs + 3)}Completes") if debug else ""
-            closure_on_item(row, col, item_chart, symbol_chart, item, error=item_error, debug=debug, tabs=tabs+4) # this line is new
-            closure_on_symbol(row, col, item_chart, symbol_chart, symbol=item.production.lhs, item=item, error=item_error, debug=debug, tabs=tabs+4)
+            closure_on_item(row, col, item_chart, symbol_chart, item, error=item_error, error_config=error_config, debug=debug, tabs=tabs+4) # this line is new
+            closure_on_symbol(row, col, item_chart, symbol_chart, symbol=item.production.lhs, item=item, error=item_error, error_config=error_config, debug=debug, tabs=tabs+4)
         else:
             print(f"{'  ' * (tabs + 3)}Progresses") if debug else ""
-            closure_on_item(row, col, item_chart, symbol_chart, item, error=item_error, debug=debug, tabs=tabs+4)
+            closure_on_item(row, col, item_chart, symbol_chart, item, error=item_error, error_config=error_config, debug=debug, tabs=tabs+4)
 
-def closure_on_item(row: int, col: int, item_chart: list, symbol_chart: list, item: Item, error: int, debug: bool=False, tabs: int=0) -> None:
+def closure_on_item(row: int, col: int, item_chart: list,
+                    symbol_chart: list, item: Item, error: int,
+                    error_config=error_config,
+                    debug: bool=False, tabs: int=0) -> None:
     """
     Perform a closure on an item. This is done by checking if any symbols in
     the epsilon diagonal can progress the item that is to be added. i.e.
@@ -218,7 +249,7 @@ def closure_on_item(row: int, col: int, item_chart: list, symbol_chart: list, it
         item_chart (list[list[dict[item, int]]]): chart of items
         symbol_chart (list[list[dict[str, tuple(int, Tree)]]]): chart of symbols
         item (Item): item to add
-        error (int): current error metric associated with symbol
+        error_config (dict): refer to parse doc string
         debug (bool): whether or not to print a debug trace
         tabs (int): indentation for debug trace
 
@@ -231,7 +262,8 @@ def closure_on_item(row: int, col: int, item_chart: list, symbol_chart: list, it
         print(f"{'  ' * (tabs + 1)}Item Chart Cell: {item_chart[row][col]}")
         print(f"{'  ' * (tabs + 1)}Symbol Chart: {symbol_chart}")
 
-    if item in item_chart[row][col] and item_chart[row][col][item] < error:
+    # checks if an item with a lower error metric is in place or if error by itself is too high
+    if (item in item_chart[row][col] and item_chart[row][col][item] < error) or error > error_config["error_limit"]:
         print(f"{'  ' * (tabs + 1)}Item in item chart") if debug else ""
         return
 
@@ -249,17 +281,17 @@ def closure_on_item(row: int, col: int, item_chart: list, symbol_chart: list, it
         symbol_tree = cell_on_diagonal[next_symbol][1]
 
         new_item = item.progress(next_symbol, split=((row, col), (col, col)), symbol_tree=symbol_tree)
-        new_item_error = error + cell_on_diagonal[next_symbol][0]
+        new_item_error = error_config["ins_error_combiner"](error, cell_on_diagonal[next_symbol][0])
         if new_item.completed():
             print(f"{'  ' * (tabs + 1)}Item Completes") if debug else ""
             # item_chart[row][col][new_item] = new_item_error
-            closure_on_item(row, col, item_chart, symbol_chart, item=new_item, error=new_item_error, debug=debug, tabs=tabs+2)
-            closure_on_symbol(row, col, item_chart, symbol_chart, item.production.lhs, new_item, new_item_error, debug=debug, tabs=tabs+2)
+            closure_on_item(row, col, item_chart, symbol_chart, item=new_item, error=new_item_error, error_config=error_config, debug=debug, tabs=tabs+2)
+            closure_on_symbol(row, col, item_chart, symbol_chart, item.production.lhs, new_item, new_item_error, error_config=error_config, debug=debug, tabs=tabs+2)
         else:
             print(f"{'  ' * (tabs + 1)}Item does not Completes") if debug else ""
-            closure_on_item(row, col, item_chart, symbol_chart, item=new_item, error=new_item_error, debug=debug, tabs=tabs+2)
+            closure_on_item(row, col, item_chart, symbol_chart, item=new_item, error=new_item_error, error_config=error_config, debug=debug, tabs=tabs+2)
 
-def fill_diagonal(n: int, sentence: str, symbol_chart: list, item_chart: list, init_error: int=0, debug: bool=False, tabs: int=0) -> None:
+def fill_diagonal(n: int, sentence: str, symbol_chart: list, item_chart: list, error_config=error_config, debug: bool=False, tabs: int=0) -> None:
     """
     Fill in the first diagonal after the epsilon diagonal of the symbol and 
     item charts inplace. This is done by putting the initial symbols from
@@ -281,9 +313,9 @@ def fill_diagonal(n: int, sentence: str, symbol_chart: list, item_chart: list, i
         col = row + 1
         symbol = sentence[row]
 
-        closure_on_symbol(row, col, item_chart, symbol_chart, symbol, item=None, error=init_error, debug=debug, tabs=tabs+1)
+        closure_on_symbol(row, col, item_chart, symbol_chart, symbol, item=None, error=error_config["init_error"], error_config=error_config, debug=debug, tabs=tabs+1)
 
-def fill_rest(n: int, symbol_chart: list, item_chart: list, error_correct: bool=False, debug: bool=False, tabs: int=0) -> None:
+def fill_rest(n: int, symbol_chart: list, item_chart: list, error_config=error_config, debug: bool=False, tabs: int=0) -> None:
     """
     Fill in remaining diagonals apart from the epsilon and first diagonal.
 
@@ -291,7 +323,7 @@ def fill_rest(n: int, symbol_chart: list, item_chart: list, error_correct: bool=
         n (int): length of the sentence
         symbol_chart (list[list[dict[str, int]]]): chart of symbols
         item_chart (list[list[dict[item, int]]]): chart of items
-        error_correct (bool): whether or not to error_correct
+        error_config (dict): refer to parse doc string
         debug (bool): whether or not to print a debug trace
         tabs (int): indentation for debug trace
 
@@ -322,23 +354,27 @@ def fill_rest(n: int, symbol_chart: list, item_chart: list, error_correct: bool=
                     # also consider deletions here, make this dependent on some variable
                     for e_sym_row in range(sym_row, sym_col):
                         symbol_cell = symbol_chart[e_sym_row][sym_col]
-                        
+
                         if next_symbol in symbol_cell:
-                            new_item_error = item_error + symbol_cell[next_symbol][0] + deletion_count # TODO: insert some function/heuristic here
+                            # custom error combiner
+                            new_item_error = error_config["del_error_combiner"](item_error, symbol_cell[next_symbol][0], deletion_count)
+                            # error cut-off
+                            if new_item_error > 3:
+                                continue
                             symbol_tree = symbol_cell[next_symbol][1]
                             new_item = item.progress(next_symbol, split=((item_row, item_col), (sym_row, sym_col)), symbol_tree=symbol_tree)
                             if new_item.completed(): 
                                 print(f"{'  ' * (tabs + 4)}Item Completes, adding {item.production.lhs} to symbol chart") if debug else ""
                                 item_chart[row][col][new_item] = new_item_error
-                                closure_on_symbol(row, col, item_chart, symbol_chart, item.production.lhs, new_item, new_item_error, debug=debug, tabs=tabs+5)
+                                closure_on_symbol(row, col, item_chart, symbol_chart, item.production.lhs, new_item, new_item_error, error_config=error_config, debug=debug, tabs=tabs+5)
                                 print(f"{'  ' * (tabs + 4)}Symbol Chart: {symbol_chart}") if debug else ""
                                 print(f"{'  ' * (tabs + 4)}Item Chart: {item_chart}") if debug else ""
                             else:
-                                closure_on_item(row, col, item_chart, symbol_chart, new_item, new_item_error, debug=debug, tabs=tabs+5)
+                                closure_on_item(row, col, item_chart, symbol_chart, new_item, new_item_error, error_config=error_config, debug=debug, tabs=tabs+5)
                                 print(f"{'  ' * (tabs + 4)}Item progressing, adding {new_item} to item chart") if debug else ""
                                 print(f"{'  ' * (tabs + 4)}Item Chart: {item_chart}") if debug else ""
                                 print(f"{'  ' * (tabs + 4)}Symbol Chart: {symbol_chart}") if debug else ""
-                        if not error_correct:
+                        if not error_config["error_correct"]:
                             break
 
                         deletion_count += 1
