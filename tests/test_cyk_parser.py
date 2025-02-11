@@ -32,7 +32,7 @@ def test_parser_on_grammar_3():
     assert "Start" in parse("cde", productions_3, init_items_3)[0][0][3]
     assert "Start" in parse("ef", productions_3, init_items_3)[0][0][2]
 
-def test_parser_on_gramamr_4():
+def test_parser_on_grammar_4():
     assert "Start" in parse("()", productions_4, init_items_4, debug=False)[0][0][2]
     assert "Start" in parse("()[]", productions_4, init_items_4, debug=False)[0][0][4]
     assert "Start" in parse("([])", productions_4, init_items_4, debug=False)[0][0][4]
@@ -42,7 +42,7 @@ def test_parser_on_gramamr_4():
     assert "Start" not in parse("[(])", productions_4, init_items_4, debug=False)[0][0][4]
     assert "Start" not in parse("(])", productions_4, init_items_4, debug=False)[0][0][3]
 
-def test_parser_on_gramamr_5():
+def test_parser_on_grammar_5():
     assert "Start" in parse("X", productions_5, init_items_5, debug=False)[0][0][1]
     assert "Start" in parse("XX", productions_5, init_items_5, debug=False)[0][0][2]
     assert "Start" in parse("XXX", productions_5, init_items_5, debug=False)[0][0][3]
@@ -52,5 +52,5 @@ def test_parser_on_gramamr_5():
 test_parser_on_grammar_1()
 test_parser_on_grammar_2()
 test_parser_on_grammar_3()
-test_parser_on_gramamr_4()
-test_parser_on_gramamr_5()
+test_parser_on_grammar_4()
+test_parser_on_grammar_5()
