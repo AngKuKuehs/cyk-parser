@@ -63,6 +63,8 @@ def convert_lark_tree(tree):
 
     return Tree(node_val, new_children)
 
+#TODO: strip deleted symbols from cyk tree
+
 def save_tree(tree, path):
     counter = 0
     dot = graphviz.Digraph(comment="Tree")
@@ -83,7 +85,20 @@ def save_tree(tree, path):
                 node_val = child
 
             # create new node
-            dot.node(str(counter), repr(node_val))
+            #TODO: color node appropriately
+            if isinstance(node_val, Symbol):
+                if node_val.origin == "deleted":
+                    dot.node(str(counter), repr(node_val), style="filled", fillcolor="red")
+                elif node_val.origin == "inserted":
+                    dot.node(str(counter), repr(node_val), style="filled", fillcolor="green")
+                elif node_val.origin == "skipped to":
+                    dot.node(str(counter), repr(node_val), style="filled", fillcolor="orange")
+                elif node_val.origin == "sentence":
+                    dot.node(str(counter), repr(node_val), style="filled")
+                else:
+                    dot.node(str(counter), repr(node_val))
+            else:
+                dot.node(str(counter), repr(node_val))
             # connect new node to parent
             dot.edge(parent, str(counter))
 
@@ -117,5 +132,5 @@ def get_files_from_dir(directory):
     
     return all_files
 
-def convert_lark_tokens_for_cyk(tokens):
+def convert_lark_tokens_for_cyk(tokens: list[Token]) -> list[str]:
     return list(map(lambda x: x.type, tokens))

@@ -1,7 +1,8 @@
 import item
+from symbol import Symbol
 
 class Production():
-    def __init__(self, lhs: str, rhs: list, name=None):
+    def __init__(self, lhs: str, rhs: list[str], name=None):
         self.lhs = lhs
         self.rhs = rhs
         self.name = name
