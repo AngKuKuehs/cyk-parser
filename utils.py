@@ -5,6 +5,8 @@ import graphviz
 from lark.tree import Tree
 from lark.lexer import Token
 
+from symbol import Symbol
+
 def read(fn, *args):
     kwargs = {'encoding': 'iso-8859-1'}
     with open(fn, *args, **kwargs) as f:
@@ -17,14 +19,20 @@ def trim_children(children):
     """
     trimmed_children = []
     for tree in children:
-        parent_val = tree.data
-        if parent_val.endswith("}"):
-            parent_val = parent_val.split("{")[0]
+        curr_val = tree.data
+        if isinstance(curr_val, Symbol):
+            curr_val = curr_val.value
+
+        if curr_val.endswith("}"): # handles cases where there are multiple stuff
+            curr_val = curr_val.split("{")[0]
         trim = trim_children(tree.children)
-        if parent_val.startswith("__") or parent_val == "None" or (parent_val.startswith("_") and not parent_val[1].isupper()):
-            trimmed_children += trim
+
+        if curr_val.startswith("__") or curr_val == "None" or (curr_val.startswith("_") and not curr_val[1].isupper()):
+            trimmed_children += trim # removes current value from tree
         else:
-            trimmed_children.append(Tree(parent_val, trim))
+            if isinstance(tree.data, Symbol):
+                curr_val = Symbol(origin=tree.data.origin, value=curr_val, error=tree.data.error, row=tree.data.row, col=tree.data.col)
+            trimmed_children.append(Tree(curr_val, trim)) # keeps curr value in tree
     return trimmed_children
 
 def __strip_token(tkn):
@@ -55,16 +63,15 @@ def convert_lark_tree(tree):
 
     return Tree(node_val, new_children)
 
+#TODO: strip deleted symbols from cyk tree
+
 def save_tree(tree, path):
     counter = 0
     dot = graphviz.Digraph(comment="Tree")
-    if isinstance(tree.data, Token):
-        dot.node(str(counter), repr(tree.data.value))
-    else:
-        dot.node(str(counter), repr(tree.data))
-    
+    dot.node(str(counter), repr(tree.data))
+
     parent = "0"
-    curr_children = tree.children
+    curr_children = tree.children 
     children_stack = []
     while curr_children:
         # iterate through children of current node
@@ -78,7 +85,20 @@ def save_tree(tree, path):
                 node_val = child
 
             # create new node
-            dot.node(str(counter), node_val)
+            #TODO: color node appropriately
+            if isinstance(node_val, Symbol):
+                if node_val.origin == "deleted":
+                    dot.node(str(counter), repr(node_val), style="filled", fillcolor="red")
+                elif node_val.origin == "inserted":
+                    dot.node(str(counter), repr(node_val), style="filled", fillcolor="green")
+                elif node_val.origin == "skipped to":
+                    dot.node(str(counter), repr(node_val), style="filled", fillcolor="orange")
+                elif node_val.origin == "sentence":
+                    dot.node(str(counter), repr(node_val), style="filled")
+                else:
+                    dot.node(str(counter), repr(node_val))
+            else:
+                dot.node(str(counter), repr(node_val))
             # connect new node to parent
             dot.edge(parent, str(counter))
 
@@ -112,5 +132,5 @@ def get_files_from_dir(directory):
     
     return all_files
 
-def convert_lark_tokens_for_cyk(tokens):
+def convert_lark_tokens_for_cyk(tokens: list[Token]) -> list[str]:
     return list(map(lambda x: x.type, tokens))

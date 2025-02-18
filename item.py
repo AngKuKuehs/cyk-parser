@@ -34,7 +34,7 @@ class Item():
         else:
             return None
 
-    def progress(self, symbol, split, symbol_tree):
+    def progress(self, symbol, split, symbol_tree, del_sym_trees=None):
         """
         Progresses the item if the string provided is matches the next symbol needed to progress the item.
 
@@ -51,6 +51,8 @@ class Item():
             new_item = Item(self.production, self.dot + 1, split)
             if symbol_tree:
                 new_item.children += self.children
+                if del_sym_trees: # add deleted elements to the symbol tree
+                    new_item.children += del_sym_trees
                 new_item.children.append(symbol_tree)
             return new_item
         else:
