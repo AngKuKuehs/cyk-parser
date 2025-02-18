@@ -28,7 +28,7 @@ class Symbol():
         sentence_val = ""
         if hasattr(self, "sentence_val"):
             sentence_val = f": {self.sentence_val}"
-        return f"Symbol(:'{self.value}'{sentence_val}, {self.error})"
+        return f"Symbol('{self.value}'{sentence_val}, {self.error})"
 
     def __repr__(self):
         sentence_val = ""
