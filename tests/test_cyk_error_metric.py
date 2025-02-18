@@ -1,6 +1,7 @@
 
 from cyk_parser import load_productions_from_json, parse
 from lark_parser import LarkParser
+from error_combiners import *
 from utils import *
 
 productions_1, init_items_1 = load_productions_from_json("grammars/simple_CNF_grammar.json")
@@ -10,43 +11,53 @@ productions_4, init_items_4 = load_productions_from_json("grammars/square_bracke
 productions_5, init_items_5 = load_productions_from_json("grammars/ambigious.json", debug=False)
 python_productions, init_items_python = load_productions_from_json("grammars/python.json", debug=False)
 
+error_config = {
+    "error_correct": False,
+    "init_error": 1,
+    "del_error_combiner": simple_del_addition,
+    "ins_error_combiner": simple_ins_addition,
+    "std_error_combiner": simple_std_addition,
+    "init_ins_error": 1,
+    "init_del_error": 1,
+    "error_limit": 300
+}
 
 def test_parser_on_grammar_1():
-    assert parse("abc", productions_1, init_items_1, init_error=1)[0][0][3]["Start"][0] == len("abc")
-    assert parse("ab", productions_1, init_items_1, init_error=1)[0][0][2]["Start"][0] == len("ab")
-    assert parse("bc", productions_1, init_items_1, init_error=1)[0][0][2]["Start"][0] == len("bc")
+    assert parse("abc", productions_1, init_items_1, error_config=error_config)[0][0][3]["Start"][0] == len("abc")
+    assert parse("ab", productions_1, init_items_1, error_config=error_config)[0][0][2]["Start"][0] == len("ab")
+    assert parse("bc", productions_1, init_items_1, error_config=error_config)[0][0][2]["Start"][0] == len("bc")
 
 def test_parser_on_grammar_2():
-    assert parse("abc", productions_2, init_items_2, init_error=1)[0][0][3]["Start"][0] == len("abc")
-    assert parse("bcbb", productions_2, init_items_2, init_error=1)[0][0][4]["Start"][0] == len("bcbb")
-    assert parse("bcbbcb", productions_2, init_items_2, debug=False, init_error=1)[0][0][6]["Start"][0] == len("bcbbcb")
-    assert parse("aa", productions_2, init_items_2, init_error=1)[0][0][2]["Start"][0] == len("aa")
+    assert parse("abc", productions_2, init_items_2, error_config=error_config)[0][0][3]["Start"][0] == len("abc")
+    assert parse("bcbb", productions_2, init_items_2, error_config=error_config)[0][0][4]["Start"][0] == len("bcbb")
+    assert parse("bcbbcb", productions_2, init_items_2, debug=False, error_config=error_config)[0][0][6]["Start"][0] == len("bcbbcb")
+    assert parse("aa", productions_2, init_items_2, error_config=error_config)[0][0][2]["Start"][0] == len("aa")
 
 def test_parser_on_grammar_3():
-    assert parse("b", productions_3, init_items_3, debug=False, init_error=1)[0][0][1]["Start"][0] == len("b")
-    assert parse("ce", productions_3, init_items_3, init_error=1)[0][0][2]["Start"][0] == len("ce")
-    assert parse("cde", productions_3, init_items_3, init_error=1)[0][0][3]["Start"][0] == len("cde")
-    assert parse("ef", productions_3, init_items_3, init_error=1)[0][0][2]["Start"][0] == len("ef")
+    assert parse("b", productions_3, init_items_3, debug=False, error_config=error_config)[0][0][1]["Start"][0] == len("b")
+    assert parse("ce", productions_3, init_items_3, error_config=error_config)[0][0][2]["Start"][0] == len("ce")
+    assert parse("cde", productions_3, init_items_3, error_config=error_config)[0][0][3]["Start"][0] == len("cde")
+    assert parse("ef", productions_3, init_items_3, error_config=error_config)[0][0][2]["Start"][0] == len("ef")
 
 def test_parser_on_gramamr_4():
-    assert parse("()", productions_4, init_items_4, debug=False, init_error=1)[0][0][2]["Start"][0] == 2
-    assert parse("()[]", productions_4, init_items_4, debug=False, init_error=1)[0][0][4]["Start"][0] == 4
-    assert parse("([])", productions_4, init_items_4, debug=False, init_error=1)[0][0][4]["Start"][0] == 4
-    assert parse("[()]", productions_4, init_items_4, debug=False, init_error=1)[0][0][4]["Start"][0] == 4
-    assert parse("[[[]]]", productions_4, init_items_4, debug=False, init_error=1)[0][0][6]["Start"][0] == 6
+    assert parse("()", productions_4, init_items_4, debug=False, error_config=error_config)[0][0][2]["Start"][0] == 2
+    assert parse("()[]", productions_4, init_items_4, debug=False, error_config=error_config)[0][0][4]["Start"][0] == 4
+    assert parse("([])", productions_4, init_items_4, debug=False, error_config=error_config)[0][0][4]["Start"][0] == 4
+    assert parse("[()]", productions_4, init_items_4, debug=False, error_config=error_config)[0][0][4]["Start"][0] == 4
+    assert parse("[[[]]]", productions_4, init_items_4, debug=False, error_config=error_config)[0][0][6]["Start"][0] == 6
 
 def test_parser_on_gramamr_5():
-    assert parse("X", productions_5, init_items_5, debug=False, init_error=1)[0][0][1]["Start"][0] == len("X")
-    assert parse("XX", productions_5, init_items_5, debug=False, init_error=1)[0][0][2]["Start"][0] == len("XX")
-    assert parse("XXX", productions_5, init_items_5, debug=False, init_error=1)[0][0][3]["Start"][0] == len("XXX")
-    assert parse("XXXX", productions_5, init_items_5, debug=False, init_error=1)[0][0][4]["Start"][0] == len("XXXX")
-    assert parse("XXXXX", productions_5, init_items_5, debug=False, init_error=1)[0][0][5]["Start"][0] == len("XXXXX")
+    assert parse("X", productions_5, init_items_5, debug=False, error_config=error_config)[0][0][1]["Start"][0] == len("X")
+    assert parse("XX", productions_5, init_items_5, debug=False, error_config=error_config)[0][0][2]["Start"][0] == len("XX")
+    assert parse("XXX", productions_5, init_items_5, debug=False, error_config=error_config)[0][0][3]["Start"][0] == len("XXX")
+    assert parse("XXXX", productions_5, init_items_5, debug=False, error_config=error_config)[0][0][4]["Start"][0] == len("XXXX")
+    assert parse("XXXXX", productions_5, init_items_5, debug=False, error_config=error_config)[0][0][5]["Start"][0] == len("XXXXX")
 
 def test_parser_on_python_grammar():
     parser = LarkParser()
     tokens = parser.lex(read("references/python-3.0-library/encodings/ascii.py") + "\n")
     tokens = convert_lark_tokens_for_cyk(tokens)
-    assert(parse(tokens, python_productions, init_items_python, init_error=1))[0][0][-1]["file_input"][0] == len(tokens)
+    assert(parse(tokens, python_productions, init_items_python, error_config=error_config))[0][0][-1]["file_input"][0] == len(tokens)
 
 test_parser_on_grammar_1()
 test_parser_on_grammar_2()
