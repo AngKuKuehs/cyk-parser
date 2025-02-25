@@ -5,10 +5,13 @@ from lark.tree import Tree
 from item import Item
 from symbol import Symbol
 from production import Production
-from error_combiners import simple_del_addition, simple_ins_addition, simple_std_addition
+from error_config import no_correction_config
 
+# CONSTANTS
 make_tree = True
+error_config = no_correction_config()
 
+# FUNCTIONS
 def load_productions_from_json(path: str, debug: bool=False, tabs: int=0) -> dict:
     """
     Loads a dictionary of productions from a json file.
@@ -59,16 +62,6 @@ def load_productions_from_json(path: str, debug: bool=False, tabs: int=0) -> dic
     print(f"{'  ' * tabs}Init Items: {init_items}") if debug else ""
     return productions, init_items
 
-error_config = {
-    "error_correct": False,
-    "init_error": 0,
-    "del_error_combiner": simple_del_addition,
-    "ins_error_combiner": simple_ins_addition,
-    "std_error_combiner": simple_std_addition,
-    "init_ins_error": 1,
-    "init_del_error": 1,
-    "error_limit": 1
-}
 
 def parse(sentence: str, productions: dict, init_items: list, error_config=error_config, debug: bool=False, tabs: int=0) -> tuple:
     """
@@ -382,6 +375,9 @@ def fill_rest(n: int, symbol_chart: list, item_chart: list, sentence: list[str],
                     for e_sym_row in range(sym_row, sym_col):
                         symbol_cell = symbol_chart[e_sym_row][sym_col]
 
+                        # TODO: just skip once cap is met, could make things faster, just break the loop -> make it optional to turn on and off, add to error_config, be careful here
+                        if deletion_count > error_config["error_limit"]:
+                            break
                         if deletion_count != 0: # in a deletion, append deleted symbols into symbol_tree -> this deletion not actually used? ya -> init_del_error is useless
                             del_str = sentence[item_col + deletion_count - 1] # should be correct?
                             del_symbol = Symbol(origin="deleted", value=del_str, error=error_config["init_del_error"], row=item_col+deletion_count-1, col=item_col+deletion_count)

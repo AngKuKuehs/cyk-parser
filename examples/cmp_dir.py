@@ -6,28 +6,20 @@ from lark_parser import LarkParser
 from lark.tree import Tree
 from utils import *
 from error_combiners import *
+from error_config import no_correction_config
 
 parser = LarkParser()
 
 python_productions, init_items_python = load_productions_from_json("grammars/python.json", debug=False)
 
-error_config = {
-    "error_correct": False,
-    "init_error": 0,
-    "del_error_combiner": simple_del_addition,
-    "ins_error_combiner": simple_ins_addition,
-    "std_error_combiner": simple_std_addition,
-    "init_ins_error": 0,
-    "init_del_error": 0,
-    "error_limit": 0
-}
+error_config = no_correction_config()
 
 # generate parse trees for all files in a directory
 def cmp_dir(directory):
     print(",".join(["file", "num lines", "lark time", "cyk time", "num tokens", "trees equal"]))
     files = get_files_from_dir(directory)
     for file_name, file_path, num_lines in files:
-            if num_lines > 50:
+            if num_lines > 20:
                 continue
             entry = [file_path, f"{num_lines}"] # file path, num lines
 

@@ -2,6 +2,7 @@
 from cyk_parser import load_productions_from_json, parse
 from lark_parser import LarkParser
 from error_combiners import *
+from error_config import *
 from utils import *
 
 productions_1, init_items_1 = load_productions_from_json("grammars/simple_CNF_grammar.json")
@@ -11,16 +12,9 @@ productions_4, init_items_4 = load_productions_from_json("grammars/square_bracke
 productions_5, init_items_5 = load_productions_from_json("grammars/ambigious.json", debug=False)
 python_productions, init_items_python = load_productions_from_json("grammars/python.json", debug=False)
 
-error_config = {
-    "error_correct": False,
-    "init_error": 1,
-    "del_error_combiner": simple_del_addition,
-    "ins_error_combiner": simple_ins_addition,
-    "std_error_combiner": simple_std_addition,
-    "init_ins_error": 1,
-    "init_del_error": 1,
-    "error_limit": 300
-}
+error_config = no_correction_config()
+error_config["error_limit"] = 10
+error_config["init_error"] = 1
 
 def test_parser_on_grammar_1():
     assert parse("abc", productions_1, init_items_1, error_config=error_config)[0][0][3]["Start"][0] == len("abc")
@@ -64,4 +58,5 @@ test_parser_on_grammar_2()
 test_parser_on_grammar_3()
 test_parser_on_gramamr_4()
 test_parser_on_gramamr_5()
+error_config["error_limit"] = 250
 test_parser_on_python_grammar()

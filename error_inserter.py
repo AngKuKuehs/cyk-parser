@@ -23,7 +23,7 @@ def get_tokens(directory="references/python-3.0-library", max_lines=50):
     files = get_files_from_dir(directory)
     token_dict = {}
     for file_name, file_path, num_lines in files:
-        if num_lines > max_lines:
+        if num_lines > max_lines or "__init__.py" in file_name:
             continue
         try:
             tokens = parser.lex(read(file_path) + "\n")
@@ -75,8 +75,7 @@ def create_test_set_all_files(operation, token_dict):
                 break
     return res
 
-def save_error_file(error_tuples, error_operation):
-    directory = f"references/error_test_set/{error_operation}"
+def save_error_file(directory, error_tuples):
     os.makedirs(os.path.dirname(directory), exist_ok=True)
     with open(f'{directory}.pkl', 'wb') as f:  # open a text file
         pickle.dump(error_tuples, f)

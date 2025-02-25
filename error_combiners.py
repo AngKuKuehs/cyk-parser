@@ -12,3 +12,5 @@ def simple_ins_addition(item_error: int, item: Item, symbol_error: int, symbol: 
 def simple_std_addition(item_error: int, item: Item, symbol_error: int, symbol: Symbol):
     return item_error + symbol_error
 
+def simple_front_end_del_addition(front_deletions, end_deletions, root_error):
+    return front_deletions + end_deletions + root_error
