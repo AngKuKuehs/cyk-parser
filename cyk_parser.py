@@ -203,7 +203,9 @@ def closure_on_symbol(row: int, col: int, item_chart: list[list[Item]],
         print(f"{'  ' * (tabs + 1)}Item Chart: {item_chart}") if debug else ""
 
     # checks if a symbol with a lower error metric is in place or if error by itself is too high
-    if symbol in symbol_chart[row][col] and (error >= symbol_chart[row][col][symbol][0] or error > error_config["error_limit"]):
+    error_cmp = error_config["error_comparator"]
+    limit_cmp = error_config["limit_comparator"]
+    if symbol in symbol_chart[row][col] and (error_cmp(new_error=error, old_error=symbol_chart[row][col][symbol][0]) or limit_cmp(new_error=error, error_limit=error_config["error_limit"])):
         print(f"{'  ' * (tabs + 1)}symbol in cell already") if debug else ""
         return
 
@@ -233,7 +235,7 @@ def closure_on_symbol(row: int, col: int, item_chart: list[list[Item]],
                                           error_combiner(item_error=prev_item[1], item=prev_item[0], symbol_error=error, symbol=symbol)),
                         item_chart[row][row].items())
 
-    new_items = dict(filter(lambda x: (x[0] is not None) and (x[1] <= error_config["error_limit"]), new_items_map))
+    new_items = dict(filter(lambda x: (x[0] is not None) and (not error_config["limit_comparator"](x[1], error_config["error_limit"])), new_items_map))
 
     print(f"{'  ' * (tabs + 1)}New items from closure: {new_items}") if debug else ""
 
@@ -277,8 +279,10 @@ def closure_on_item(row: int, col: int, item_chart: list,
         print(f"{'  ' * (tabs + 1)}Item Chart Cell: {item_chart[row][col]}")
         print(f"{'  ' * (tabs + 1)}Symbol Chart: {symbol_chart}")
 
-    # checks if an item with a lower error metric is in place or if error by itself is too high
-    if item in item_chart[row][col] and (error >= item_chart[row][col][item] or error > error_config["error_limit"]):
+    # checks if an item with a lower error metric is in place or if error by itself is too high    
+    error_cmp = error_config["error_comparator"]
+    limit_cmp = error_config["limit_comparator"]
+    if item in item_chart[row][col] and (error_cmp(new_error=error, old_error=item_chart[row][col][item]) or limit_cmp(new_error=error, error_limit=error_config["error_limit"])):
         print(f"{'  ' * (tabs + 1)}Item in item chart") if debug else ""
         return
 
@@ -387,7 +391,7 @@ def fill_rest(n: int, symbol_chart: list, item_chart: list, sentence: list[str],
                             assert(symbol_cell[next_symbol][0] == symbol_cell[next_symbol][1].data.error)
                             new_item_error = error_config["del_error_combiner"](item_error=item_error, item=item, symbol_error=symbol_cell[next_symbol][0], symbol=symbol_cell[next_symbol][1].data, deletion_count=deletion_count)
                             # error cut-off
-                            if new_item_error > error_config["error_limit"]:
+                            if error_config["limit_comparator"](new_error=new_item_error, error_limit=error_config["error_limit"]):
                                 continue
 
                             symbol_tree = symbol_cell[next_symbol][1]
