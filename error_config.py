@@ -11,20 +11,23 @@ def no_correction_config():
         "front_end_del_error_combiner": simple_front_end_del_addition,
         "error_comparator": simple_error_compare,
         "limit_comparator": simple_limit_compare,
-        "init_ins_error": 1,
-        "init_del_error": 1, # not actually used in error metric calcs since deletions aren't part of the tree
+        "init_ins_error": 0,
+        "init_del_error": 0, # not actually used in error metric calcs since deletions aren't part of the tree
         "error_limit": 0
         }
 
 def basic_correction_config(error_limit=1):
     config = no_correction_config()
     config["error_correct"] = True
+    config["init_ins_error"] = 1
+    config["init_del_error"] = 1
     config["error_limit"] = error_limit
     return config
 
-def increase_insertion_cost_correction_config(error_limit=1, insertion_cost=2):
+def custom_cost_correction_config(error_limit=1, deletion_cost=1, insertion_cost=1):
     config = no_correction_config()
     config["error_correct"] = True
     config["init_ins_error"] = insertion_cost
+    config["init_del_error"] = deletion_cost
     config["error_limit"] = error_limit
     return config

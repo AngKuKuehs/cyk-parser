@@ -3,12 +3,12 @@ from lark.tree import Tree
 from utils import *
 from cyk_parser import load_productions_from_json
 from error_parser import ec_parse
-from error_config import basic_correction_config, increase_insertion_cost_correction_config
+from error_config import basic_correction_config, custom_cost_correction_config
 
 productions_4, init_items_4 = load_productions_from_json("grammars/square_brackets.json", debug=False)
 
 error_config = basic_correction_config(error_limit=5)
-error_config = increase_insertion_cost_correction_config(error_limit=5, insertion_cost=2)
+error_config = custom_cost_correction_config(error_limit=1, deletion_cost=1, insertion_cost=2)
 
 def test_cyk_correction():
     cyk_tree = ec_parse("(])", productions_4, init_items_4, error_config=error_config, hard_limit=5, start_token="Start", debug=False)

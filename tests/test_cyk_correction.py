@@ -2,12 +2,12 @@ from lark.tree import Tree
 
 from utils import *
 from cyk_parser import load_productions_from_json, parse
-from error_config import basic_correction_config
+from error_config import custom_cost_correction_config
 from error_parser import ec_parse
 
 productions_4, init_items_4 = load_productions_from_json("grammars/square_brackets.json", debug=False)
 
-error_config = basic_correction_config(error_limit=5)
+error_config = custom_cost_correction_config(error_limit=5, deletion_cost=1, insertion_cost=2)
 
 def test_cyk_correction():
     symbol_chart = parse("(])", productions_4, init_items_4, error_config=error_config, debug=False)[0]
