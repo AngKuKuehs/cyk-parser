@@ -4,7 +4,6 @@ from lark.tree import Tree
 
 from item import Item
 from symbol import Symbol
-from utils import get_leftmost_leaves, get_rightmost_leaves
 
 @dataclass
 class DelParams():

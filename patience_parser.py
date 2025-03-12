@@ -36,7 +36,6 @@ def patience_parse(sentence: str, productions: dict, init_items: list, error_con
     error_cmp = error_config["error_comparator"]
     error_limit_cmp = error_config["limit_comparator"]
     while True:
-        print(f"trying to parse sentence: {sentence}")
         sent_len = len(sentence)
         symbol_chart, _ = parse(sentence=sentence, productions=productions, init_items=init_items, error_config=error_config, debug=debug, tabs=tabs)
         if start_token in symbol_chart[0][-1]: # parsed successfully, get tree/metric
@@ -44,8 +43,6 @@ def patience_parse(sentence: str, productions: dict, init_items: list, error_con
             error_metric = symbol_chart[0][-1][start_token][0]
             parse_tree = symbol_chart[0][-1][start_token][1]
             leaves = get_leaves(parse_tree, leaves=[], include_del=True)
-            print("".join(leaves))
-            print("ret 1")
             return partial_trees + [parse_tree]
         else: # unsuccessful parse, set generic tree/metric
             parse_tree = None
@@ -85,7 +82,6 @@ def patience_parse(sentence: str, productions: dict, init_items: list, error_con
                 end = col
                 if start_token in symbol_chart[row][col] and (not error_cmp(symbol_chart[row][col][start_token][0], error_metric)):
                 # if start_token in symbol_chart[row][col]:
-                    print("found partial tree")
                     # print(f"found start token at: {row, col}")
                     parse_tree = symbol_chart[row][col][start_token][1]
                     error_metric = symbol_chart[row][col][start_token][0]
@@ -93,14 +89,12 @@ def patience_parse(sentence: str, productions: dict, init_items: list, error_con
 
             # partial parse tree found - edit string and retry
             if parse_tree:
-                print("tree editted")
                 # add parse tree to partial trees
                 partial_trees.append(parse_tree)
 
                 # update input string, should exclude deletions
                 leaves = get_leaves(parse_tree, leaves=[],include_del=True)
                 if isinstance(sentence, str):
-                    print(f"{sentence[:start]} + {''.join(leaves)} + {sentence[end:]}")
                     sentence = sentence[:start] + "".join(leaves) + sentence[end:]
                 else:
                     sentence = sentence[:start] + leaves + sentence[end:]
