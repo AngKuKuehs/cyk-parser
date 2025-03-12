@@ -134,3 +134,15 @@ def get_files_from_dir(directory):
 
 def convert_lark_tokens_for_cyk(tokens: list[Token]) -> list[str]:
     return list(map(lambda x: x.type, tokens))
+
+def get_leaves(parse_tree, leaves=None, include_del=True):
+    if leaves == None:
+        leaves = []
+    if not parse_tree.children:
+        if include_del or parse_tree.data.origin != "deleted":
+            leaves.append(parse_tree.data)
+    else:
+        for child in parse_tree.children:
+            get_leaves(child, leaves, include_del=include_del)
+
+    return list(map(lambda sym: sym.value, leaves))
