@@ -6,16 +6,17 @@ from error_parser import ec_parse
 from error_config import basic_correction_config, custom_cost_correction_config
 
 productions_4, init_items_4 = load_productions_from_json("grammars/square_brackets.json", debug=False)
+productions_5, init_items_5 = load_productions_from_json("grammars/test.json", debug=False)
 
-error_config = basic_correction_config(error_limit=5)
-error_config = custom_cost_correction_config(error_limit=1, deletion_cost=1, insertion_cost=2)
+# error_config = basic_correction_config(error_limit=5)
+error_config = custom_cost_correction_config(error_limit=2, deletion_cost=1, insertion_cost=1)
 
-def test_cyk_correction():
+def test_ec_correction():
     cyk_tree = ec_parse("(])", productions_4, init_items_4, error_config=error_config, hard_limit=5, start_token="Start", debug=False)
     assert cyk_tree
     save_tree(cyk_tree, path=f"./outputs/trees/test_ec_correction_brackets/1_tree")
 
-    cyk_tree = ec_parse("[))]", productions_4, init_items_4, error_config=error_config, hard_limit=5, start_token="Start", debug=False)
+    cyk_tree = ec_parse("[)))]", productions_4, init_items_4, error_config=error_config, hard_limit=5, start_token="Start", debug=False)
     assert cyk_tree
     save_tree(cyk_tree, path=f"./outputs/trees/test_ec_correction_brackets/2_tree")
 
@@ -35,4 +36,12 @@ def test_cyk_correction():
     assert cyk_tree
     save_tree(cyk_tree, path=f"./outputs/trees/test_ec_correction_brackets/6_tree")
 
-test_cyk_correction()
+    cyk_tree = ec_parse("[()0", productions_4, init_items_4, error_config=error_config, hard_limit=5, start_token="Start", debug=False)
+    assert cyk_tree
+    save_tree(cyk_tree, path=f"./outputs/trees/test_ec_correction_brackets/7_tree")
+
+    cyk_tree = ec_parse("[()()]", productions_4, init_items_4, error_config=basic_correction_config(error_limit=5), hard_limit=5, start_token="Start", debug=False)
+    assert cyk_tree
+    save_tree(cyk_tree, path=f"./outputs/trees/test_ec_correction_brackets/8_tree")
+
+test_ec_correction()

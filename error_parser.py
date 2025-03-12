@@ -2,11 +2,12 @@ from lark.tree import Tree
 
 from cyk_parser import parse
 from symbol import Symbol
+from error_combiners import FrontEndParams
 
 
 def ec_parse(sentence: str, productions: dict, init_items: list, error_config: dict, hard_limit: int, start_token: str, debug: bool=False, tabs: int=0) -> tuple:
     """
-    Parses a string according to the provided productions and returns the corresponding symbol chart and item chart.
+    Wrapper around cyk_parser.parse that adds backtracking and checks for other potential parse trees throughout the symbol chart.
 
     Parameters:
         sentence (str): The text to parse.
@@ -17,7 +18,6 @@ def ec_parse(sentence: str, productions: dict, init_items: list, error_config: d
             init_error (int): initial error given terminals symbols in string
             del_error_combiner (callable): function that combines errors when del occurs
             front_end_del_error_combiner (callable): a function that combines error when del at the start or end of a sentence occurs
-            ins_error_combiner (callable): function that combines errors when ins occurs
             std_error_combiner (callable): function that combines errors when a standard progression happens
             progress_error_combiner (callable): function that combines errors when item is progressed normally
             init_ins_error (int): initial error given to inserted symbols in epsilon diagonal
@@ -32,6 +32,8 @@ def ec_parse(sentence: str, productions: dict, init_items: list, error_config: d
     """
     error_config["error_correct"] = True
     sent_len = len(sentence)
+    error_cmp = error_config["error_comparator"]
+    error_limit_cmp = error_config["limit_comparator"]
     while True:
         # parse
         symbol_chart, _ = parse(sentence=sentence, productions=productions, init_items=init_items, error_config=error_config, debug=debug, tabs=tabs)
@@ -44,7 +46,7 @@ def ec_parse(sentence: str, productions: dict, init_items: list, error_config: d
         # unsuccessful parse, set generic tree/metric
         else:
             parse_tree = None
-            error_metric = float("inf")
+            error_metric = None
 
         error_limit = error_config["error_limit"]
 
@@ -57,8 +59,9 @@ def ec_parse(sentence: str, productions: dict, init_items: list, error_config: d
                 if start_token in symbol_chart[row][col]:
                     curr_tree = symbol_chart[row][col][start_token][1]
                     curr_symbol = curr_tree.data
-                    new_error = error_config["front_end_del_error_combiner"](front_deletions=row, end_deletions=(sent_len-col), root_error=curr_symbol.error)
-                    if new_error < error_metric and new_error < error_limit:
+                    params = FrontEndParams(front_deletions=row, end_deletions=(sent_len-col), root_error=curr_symbol.error, parse_tree=curr_tree)
+                    new_error = error_config["front_end_del_error_combiner"](params)
+                    if not error_cmp(new_error, error_metric) and not error_limit_cmp(new_error, error_limit):
                         curr_symbol.error = new_error
                         curr_tree.children = [Tree(data=Symbol(origin="deleted", value=sentence[k], error=0, row=k, col=k+1), children=[]) for k in range(0, row)] + curr_tree.children + [Tree(data=Symbol(origin="deleted", value=sentence[k], error=0, row=k-1, col=k), children=[]) for k in range(col, sent_len)]
                         parse_tree = curr_tree
@@ -67,10 +70,10 @@ def ec_parse(sentence: str, productions: dict, init_items: list, error_config: d
         if parse_tree:
             return parse_tree
 
-        if error_config["error_limit"] < 1:
+        if error_limit < 1:
             error_config["error_limit"] = 1
         else:
-            error_config["error_limit"] = error_config["error_limit"] * 2
+            error_config["error_limit"] = error_limit * 2
 
         if error_limit > hard_limit:
             return None
