@@ -6,6 +6,7 @@ from item import Item
 from symbol import Symbol
 from production import Production
 from error_config import no_correction_config
+from error_combiners import DelParams, StdParams
 
 # CONSTANTS
 make_tree = True
@@ -68,14 +69,13 @@ def parse(sentence: str, productions: dict, init_items: list, error_config=error
     Parses a string according to the provided productions and returns the corresponding symbol chart and item chart.
 
     Parameters:
-        sentence (str): The text to parse.
+        sentence (str|list[str]): The text to parse. If it is a string, each character is a token, else if it is a list each element is a token.
         productions (dict[str, list[Production]]): dictionary of productions
         init_items (list[Item]): list of items (partially completed productions)
         error_config (dict):
             error_correct (bool): whether or not to error_correct
             init_error (int): initial error given terminals symbols in string
             del_error_combiner (callable): function that combines errors when del occurs
-            ins_error_combiner (callable): function that combines errors when ins occurs
             progress_error_combiner (callable): function that combines errors when item is progressed normally
             init_ins_error (int): initial error given to inserted symbols in epsilon diagonal
             error_limit (int): skips items and symbols with errors greater than this
@@ -140,28 +140,48 @@ def fill_epsilon_diagonal(n: int, init_items: list, symbol_chart: list, item_cha
     print(f"{'  ' * (tabs + 0)}Filling epsilon:") if debug else ""
 
     # add empty string as a symbol
+    init_error = error_config["init_error"]
     print(f"{'  ' * (tabs + 1)}Adding ():") if debug else ""
     empty_symbol = Symbol(origin="epsilon", value=(), error=0, row=0, col=0)
-    closure_on_symbol(row=0, col=0, item_chart=item_chart, symbol_chart=symbol_chart, symbol=empty_symbol, item=None, error=0, error_config=error_config, debug=debug, tabs=tabs+2)
+    closure_on_symbol(row=0, col=0, item_chart=item_chart, symbol_chart=symbol_chart, symbol=empty_symbol, item=None, error=init_error, error_config=error_config, debug=debug, tabs=tabs+2)
 
     # add initial items and try to progress on the spot
     print(f"{'  ' * (tabs + 1)}Adding inital items:") if debug else ""
     for item in init_items:
         # insert symbols from completed items
         if item.completed():
-            new_sym = Symbol(origin="epsilon", value=item.production.lhs, error=0, row=0, col=0)
-            closure_on_symbol(0, 0, item_chart=item_chart, symbol_chart=symbol_chart, symbol=new_sym, item=item, error=0)
-        closure_on_item(row=0, col=0, item_chart=item_chart, symbol_chart=symbol_chart, item=item, error=0, error_config=error_config, debug=debug, tabs=tabs+2)
-    
-    # insertion corrections, goes through all items and try to add lhs and rhs to epislon cell with init ins error
-    if error_config["error_correct"]: #TODO: two points of truth here, symbol chart error and error contained in Sym: make one point of truth?
+            new_sym = Symbol(origin="epsilon", value=item.production.lhs, error=init_error, row=0, col=0)
+            closure_on_symbol(0, 0, item_chart=item_chart, symbol_chart=symbol_chart, symbol=new_sym, item=item, error=init_error, error_config=error_config)
+        closure_on_item(row=0, col=0, item_chart=item_chart, symbol_chart=symbol_chart, item=item, error=init_error, error_config=error_config, debug=debug, tabs=tabs+2)
+
+    # only inserts terminals
+    init_ins_error = error_config["init_ins_error"]
+    if error_config["error_correct"]:
+        terminals = set()
+        nonterminals = set()
         for item in init_items:
-            lhs_sym = Symbol(origin="inserted", value=item.production.lhs, error=error_config["init_ins_error"], row=0, col=0)
-            closure_on_symbol(row=0, col=0, item_chart=item_chart, symbol_chart=symbol_chart, symbol=lhs_sym, item=None, error=error_config["init_ins_error"], error_config=error_config, debug=debug, tabs=tabs)
+            lhs_sym = item.production.lhs
+            nonterminals.add(lhs_sym)
+            if lhs_sym in terminals:
+                terminals.remove(lhs_sym)
             rhs_ls = item.production.rhs
             for rhs in rhs_ls:
-                rhs_sym = Symbol(origin="inserted", value=rhs, error=error_config["init_ins_error"], row=0, col=0)
-                closure_on_symbol(row=0, col=0, item_chart=item_chart, symbol_chart=symbol_chart, symbol=rhs_sym, item=None, error=error_config["init_ins_error"], error_config=error_config, debug=debug, tabs=tabs)
+                if rhs not in nonterminals and rhs not in terminals:
+                    terminals.add(rhs)
+        for term in terminals:
+            term_sym = Symbol("inserted", value=term, error=init_error, row=0, col=0)
+            closure_on_symbol(row=0, col=0, item_chart=item_chart, symbol_chart=symbol_chart, symbol=term_sym, item=None, error=init_ins_error, error_config=error_config, debug=debug, tabs=tabs)
+
+    # insertion corrections, goes through all items and try to add lhs and rhs to epislon cell with init ins error => only insert terminals?
+    # init_ins_error = error_config["init_ins_error"]
+    # if error_config["error_correct"]:
+    #     for item in init_items:
+    #         lhs_sym = Symbol(origin="inserted", value=item.production.lhs, error=init_ins_error, row=0, col=0)
+    #         closure_on_symbol(row=0, col=0, item_chart=item_chart, symbol_chart=symbol_chart, symbol=lhs_sym, item=None, error=init_ins_error, error_config=error_config, debug=debug, tabs=tabs)
+    #         rhs_ls = item.production.rhs
+    #         for rhs in rhs_ls:
+    #             rhs_sym = Symbol(origin="inserted", value=rhs, error=init_ins_error, row=0, col=0)
+    #             closure_on_symbol(row=0, col=0, item_chart=item_chart, symbol_chart=symbol_chart, symbol=rhs_sym, item=None, error=init_ins_error, error_config=error_config, debug=debug, tabs=tabs)
 
     # copy cell to the rest of the diagonal
     symbol_cell = symbol_chart[0][0]
@@ -196,6 +216,7 @@ def closure_on_symbol(row: int, col: int, item_chart: list[list[Item]],
     Returns:
         None
     """
+    assert(isinstance(symbol, Symbol))
     if debug:
         print(f"{'  ' * (tabs + 0)}Closure on '{symbol}' at {row}, {col}")
         print(f"{'  ' * (tabs + 1)}Symbol Chart: {symbol_chart}")
@@ -232,10 +253,10 @@ def closure_on_symbol(row: int, col: int, item_chart: list[list[Item]],
     new_items_map = map(lambda prev_item: (prev_item[0].progress(symbol=symbol,
                                                                  split=((row, row), (row, col)), 
                                                                  symbol_tree=symbol_tree),
-                                          error_combiner(item_error=prev_item[1], item=prev_item[0], symbol_error=error, symbol=symbol)),
+                                          error_combiner(StdParams(item=prev_item[0], item_error=prev_item[1], symbol=symbol, symbol_error=error, symbol_tree=symbol_tree))),
                         item_chart[row][row].items())
 
-    new_items = dict(filter(lambda x: (x[0] is not None) and (not error_config["limit_comparator"](x[1], error_config["error_limit"])), new_items_map))
+    new_items = dict(filter(lambda x: (x[0] is not None) and (not limit_cmp(x[1], error_config["error_limit"])), new_items_map))
 
     print(f"{'  ' * (tabs + 1)}New items from closure: {new_items}") if debug else ""
 
@@ -303,7 +324,8 @@ def closure_on_item(row: int, col: int, item_chart: list,
         symbol_tree = cell_on_diagonal[next_symbol][1]
 
         new_item = item.progress(next_symbol, split=((row, col), (col, col)), symbol_tree=symbol_tree)
-        new_item_error = error_config["std_error_combiner"](item_error=error, item=item, symbol_error=cell_on_diagonal[next_symbol][0], symbol=symbol_tree.data) # this may not be exactly right?? normal progression how?
+        params = StdParams(item=item, item_error=error, symbol=symbol_tree.data, symbol_error=cell_on_diagonal[next_symbol][0], symbol_tree=symbol_tree)
+        new_item_error = error_config["std_error_combiner"](params) # this may not be exactly right?? normal progression how?
         closure_on_item(row, col, item_chart, symbol_chart, item=new_item, error=new_item_error, error_config=error_config, debug=debug, tabs=tabs+2)
         if new_item.completed():
             print(f"{'  ' * (tabs + 1)}Item Completes") if debug else ""
@@ -373,24 +395,22 @@ def fill_rest(n: int, symbol_chart: list, item_chart: list, sentence: list[str],
                 for item, item_error in item_chart[item_row][item_col].items():
                     print(f"{'  ' * (tabs + 4)}Item: {item}") if debug else ""
                     next_symbol = item.get_next_symbol()
-                    deletion_count = 0 # count of deleted symbols
-                    # also consider deletions here, make this dependent on some variable
                     deleted_symbols = []
                     for e_sym_row in range(sym_row, sym_col):
                         symbol_cell = symbol_chart[e_sym_row][sym_col]
-
+                        deletion_count = e_sym_row - sym_row
                         # TODO: just skip once cap is met, could make things faster, just break the loop -> make it optional to turn on and off, add to error_config, be careful here
-                        if deletion_count > error_config["error_limit"]:
-                            break
-                        if deletion_count != 0: # in a deletion, append deleted symbols into symbol_tree -> this deletion not actually used? ya -> init_del_error is useless
+                        # if deletion_count > error_config["error_limit"]:
+                        #     break
+                        if deletion_count > 0:
                             del_str = sentence[item_col + deletion_count - 1] # should be correct?
                             del_symbol = Symbol(origin="deleted", value=del_str, error=error_config["init_del_error"], row=item_col+deletion_count-1, col=item_col+deletion_count)
                             deleted_symbols.append(Tree(data=del_symbol, children=[]))
                         if next_symbol in symbol_cell:
-                            # custom error combiner
                             assert(symbol_cell[next_symbol][0] == symbol_cell[next_symbol][1].data.error)
-                            new_item_error = error_config["del_error_combiner"](item_error=item_error, item=item, symbol_error=symbol_cell[next_symbol][0], symbol=symbol_cell[next_symbol][1].data, deletion_count=deletion_count)
-                            # error cut-off
+                            params = DelParams(item=item, item_error=item_error, symbol=symbol_cell[next_symbol][1].data, symbol_error=symbol_cell[next_symbol][0], symbol_tree=symbol_cell[next_symbol][1], deletion_count=deletion_count)
+                            new_item_error = error_config["del_error_combiner"](params)
+
                             if error_config["limit_comparator"](new_error=new_item_error, error_limit=error_config["error_limit"]):
                                 continue
 
@@ -411,5 +431,3 @@ def fill_rest(n: int, symbol_chart: list, item_chart: list, sentence: list[str],
                                 print(f"{'  ' * (tabs + 4)}Symbol Chart: {symbol_chart}") if debug else ""
                         if not error_config["error_correct"]:
                             break
-
-                        deletion_count += 1
