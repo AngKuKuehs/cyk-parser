@@ -231,11 +231,11 @@ def closure_on_symbol(row: int, col: int, item_chart: list[list[Item]],
         return
 
     if make_tree:
-        if item == None: # symbol was not made by an item completion
-            if symbol == ():
-                symbol_tree = Tree(data="None", children=[])
-            else:
-                symbol_tree = Tree(data=symbol, children=[])
+        if item == None: # symbol was not made by an item completion?
+            # if symbol == (): # what edge case does this solve?
+            #     symbol_tree = Tree(data="None", children=[])
+            # else:
+            symbol_tree = Tree(data=symbol, children=[])
         else:
             symbol_tree = Tree(data=symbol, children=item.children) # symbol created by item completion
     else:
@@ -357,7 +357,7 @@ def fill_diagonal(n: int, sentence: str, symbol_chart: list, item_chart: list, e
         col = row + 1
         symbol = sentence[row]
         # TODO: Add original string values => get list of lark tokens? if have if not use sentence[row] 
-        new_sym = Symbol(origin="sentence", value=sentence[row], error=error_config["init_error"], row=row, col=col)
+        new_sym = Symbol(origin="sentence", value=symbol, error=error_config["init_error"], row=row, col=col)
         closure_on_symbol(row, col, item_chart=item_chart, symbol_chart=symbol_chart, symbol=new_sym, item=None, error=error_config["init_error"], error_config=error_config, debug=debug, tabs=tabs+1)
 
 def fill_rest(n: int, symbol_chart: list, item_chart: list, sentence: list[str], error_config=error_config, debug: bool=False, tabs: int=0) -> None:
@@ -421,7 +421,7 @@ def fill_rest(n: int, symbol_chart: list, item_chart: list, sentence: list[str],
                                 origin = "skipped to" if (deletion_count != 0) else "item completion"
                                 item_chart[row][col][new_item] = new_item_error
                                 new_sym = Symbol(origin=origin, value=item.production.lhs, error=new_item_error, row=row, col=col)
-                                closure_on_symbol(row, col, item_chart, symbol_chart, new_sym, new_item, new_item_error, error_config=error_config, debug=debug, tabs=tabs+5)
+                                closure_on_symbol(row=row, col=col, item_chart=item_chart, symbol_chart=symbol_chart, symbol=new_sym, item=new_item, error=new_item_error, error_config=error_config, debug=debug, tabs=tabs+5)
                                 print(f"{'  ' * (tabs + 4)}Symbol Chart: {symbol_chart}") if debug else ""
                                 print(f"{'  ' * (tabs + 4)}Item Chart: {item_chart}") if debug else ""
                             else:
