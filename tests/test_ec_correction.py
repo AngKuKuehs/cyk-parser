@@ -6,7 +6,6 @@ from error_parser import ec_parse
 from error_config import basic_correction_config, custom_cost_correction_config
 
 productions_4, init_items_4 = load_productions_from_json("grammars/square_brackets.json", debug=False)
-productions_5, init_items_5 = load_productions_from_json("grammars/test.json", debug=False)
 
 # error_config = basic_correction_config(error_limit=5)
 error_config = custom_cost_correction_config(error_limit=2, deletion_cost=1, insertion_cost=1)
