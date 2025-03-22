@@ -169,7 +169,7 @@ def fill_epsilon_diagonal(n: int, init_items: list, symbol_chart: list, item_cha
                 if rhs not in nonterminals and rhs not in terminals:
                     terminals.add(rhs)
         for term in terminals:
-            term_sym = Symbol("inserted", value=term, error=init_error, row=0, col=0)
+            term_sym = Symbol("inserted", value=term, error=init_ins_error, row=0, col=0)
             closure_on_symbol(row=0, col=0, item_chart=item_chart, symbol_chart=symbol_chart, symbol=term_sym, item=None, error=init_ins_error, error_config=error_config, debug=debug, tabs=tabs)
 
     # insertion corrections, goes through all items and try to add lhs and rhs to epislon cell with init ins error => only insert terminals?
@@ -226,6 +226,7 @@ def closure_on_symbol(row: int, col: int, item_chart: list[list[Item]],
     # checks if a symbol with a lower error metric is in place or if error by itself is too high
     error_cmp = error_config["error_comparator"]
     limit_cmp = error_config["limit_comparator"]
+
     if symbol in symbol_chart[row][col] and (error_cmp(new_error=error, old_error=symbol_chart[row][col][symbol][0]) or limit_cmp(new_error=error, error_limit=error_config["error_limit"])):
         print(f"{'  ' * (tabs + 1)}symbol in cell already") if debug else ""
         return
@@ -333,7 +334,6 @@ def closure_on_item(row: int, col: int, item_chart: list,
             closure_on_symbol(row=row, col=col, item_chart=item_chart, symbol_chart=symbol_chart, symbol=new_sym, item=new_item, error=new_item_error, error_config=error_config, debug=debug, tabs=tabs)
         else:
             print(f"{'  ' * (tabs + 1)}Item does not Completes") if debug else ""
-    
 
 def fill_diagonal(n: int, sentence: str, symbol_chart: list, item_chart: list, error_config=error_config, debug: bool=False, tabs: int=0) -> None:
     """
@@ -353,12 +353,13 @@ def fill_diagonal(n: int, sentence: str, symbol_chart: list, item_chart: list, e
         None
     """
     print(f"{'  ' * (tabs + 0)}Filling first diagonal") if debug else ""
+    initial_error = error_config["init_error"]
     for row in range(n):
         col = row + 1
         symbol = sentence[row]
         # TODO: Add original string values => get list of lark tokens? if have if not use sentence[row] 
-        new_sym = Symbol(origin="sentence", value=symbol, error=error_config["init_error"], row=row, col=col)
-        closure_on_symbol(row, col, item_chart=item_chart, symbol_chart=symbol_chart, symbol=new_sym, item=None, error=error_config["init_error"], error_config=error_config, debug=debug, tabs=tabs+1)
+        new_sym = Symbol(origin="sentence", value=symbol, error=initial_error, row=row, col=col)
+        closure_on_symbol(row, col, item_chart=item_chart, symbol_chart=symbol_chart, symbol=new_sym, item=None, error=initial_error, error_config=error_config, debug=debug, tabs=tabs+1)
 
 def fill_rest(n: int, symbol_chart: list, item_chart: list, sentence: list[str], error_config=error_config, debug: bool=False, tabs: int=0) -> None:
     """

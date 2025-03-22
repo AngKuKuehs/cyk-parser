@@ -55,7 +55,7 @@ def ec_parse(sentence: str, productions: dict, init_items: list, error_config: d
             start_col = sent_len - diagonal_length + 1
             for i in range(diagonal_length):
                 col = start_col + i
-                row = 0 + i
+                row = i
                 if start_token in symbol_chart[row][col]:
                     curr_tree = symbol_chart[row][col][start_token][1]
                     curr_symbol = curr_tree.data
