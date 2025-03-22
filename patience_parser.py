@@ -28,7 +28,11 @@ def patience_parse(sentence: str, productions: dict, init_items: list, error_con
         tabs (int): indentation for debug trace
 
     Returns:
-        parse_tree (Tree) | None : returns a parse tree if a valid parse can be found, None otherwise
+        tuple:
+            parse_tree (Tree): parse tree
+            sentence (str): original sentence parse tree is derived from
+            parse_status (str): whether parse was partial or complete, also start and end index if parse tree was partial
+
     """
     error_config["error_correct"] = True
     counter = 0
@@ -42,8 +46,7 @@ def patience_parse(sentence: str, productions: dict, init_items: list, error_con
             # get tree + metric
             error_metric = symbol_chart[0][-1][start_token][0]
             parse_tree = symbol_chart[0][-1][start_token][1]
-            leaves = get_leaves(parse_tree, leaves=[], include_del=True)
-            return partial_trees + [parse_tree]
+            return partial_trees + [(parse_tree, sentence, "complete parse")]
         else: # unsuccessful parse, set generic tree/metric
             parse_tree = None
             error_metric = None
@@ -55,7 +58,7 @@ def patience_parse(sentence: str, productions: dict, init_items: list, error_con
             start_col = sent_len - diagonal_length + 1
             for i in range(diagonal_length):
                 col = start_col + i
-                row = 0 + i
+                row = i
                 if start_token in symbol_chart[row][col]:
                     curr_tree = symbol_chart[row][col][start_token][1]
                     curr_symbol = curr_tree.data
@@ -70,30 +73,29 @@ def patience_parse(sentence: str, productions: dict, init_items: list, error_con
                         error_metric = new_error
 
         if parse_tree: # complete parse tree
-            return partial_trees + [parse_tree]
+            return partial_trees + [(parse_tree, sentence, "complete parse")]
 
-        # no lower metric found, proceed to find largest parse
+        # no parse tree found, proceed to find parse of largest substring
         for diagonal_length in range(1, sent_len + 2):
             start_col = sent_len - diagonal_length + 1
             # find best parse tree within the metric, parse tree within the same diagonal with the best metric?
+            start = None
+            end = None
             for i in range(diagonal_length):
                 col = start_col + i
-                start = row = 0 + i
-                end = col
+                row = i
                 if start_token in symbol_chart[row][col] and (not error_cmp(symbol_chart[row][col][start_token][0], error_metric)):
-                # if start_token in symbol_chart[row][col]:
-                    # print(f"found start token at: {row, col}")
+                    start = row
+                    end = col
                     parse_tree = symbol_chart[row][col][start_token][1]
                     error_metric = symbol_chart[row][col][start_token][0]
-                    # longest best parse
 
             # partial parse tree found - edit string and retry
             if parse_tree:
                 # add parse tree to partial trees
-                partial_trees.append(parse_tree)
-
+                partial_trees.append((parse_tree, sentence, f"partial parse, {sentence[:start] + '*' + sentence[start:end] + '*' + sentence[end:]}"))
                 # update input string, should exclude deletions
-                leaves = get_leaves(parse_tree, leaves=[],include_del=True)
+                leaves = get_leaves(parse_tree, leaves=[],include_del=False) #
                 if isinstance(sentence, str):
                     sentence = sentence[:start] + "".join(leaves) + sentence[end:]
                 else:
@@ -104,4 +106,4 @@ def patience_parse(sentence: str, productions: dict, init_items: list, error_con
         # try again
         counter += 1
         if counter > hard_limit:
-            return None
+            return partial_trees

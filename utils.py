@@ -65,7 +65,7 @@ def convert_lark_tree(tree):
 
 #TODO: strip deleted symbols from cyk tree
 
-def save_tree(tree, path):
+def save_tree(tree, path, text=None):
     counter = 0
     dot = graphviz.Digraph(comment="Tree")
     dot.node(str(counter), repr(tree.data))
@@ -94,7 +94,7 @@ def save_tree(tree, path):
                 elif node_val.origin == "skipped to":
                     dot.node(str(counter), repr(node_val), style="filled", fillcolor="orange")
                 elif node_val.origin == "sentence":
-                    dot.node(str(counter), repr(node_val), style="filled")
+                    dot.node(str(counter), repr(node_val), style="filled", fillcolor="grey")
                 else:
                     dot.node(str(counter), repr(node_val))
             else:
@@ -107,6 +107,10 @@ def save_tree(tree, path):
             parent, curr_children = children_stack.pop()
         else:
             curr_children = None
+
+    # check if text is provided, add to graph if so
+    if text:
+        dot.node("text", text, shape="box", style="dashed")
 
     # write tree to file
     dot.render(path)
