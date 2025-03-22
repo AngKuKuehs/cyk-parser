@@ -23,7 +23,7 @@ def get_tokens(directory="references/python-3.0-library", max_lines=50):
     files = get_files_from_dir(directory)
     token_dict = {}
     for file_name, file_path, num_lines in files:
-        if num_lines > max_lines or "__init__.py" in file_name:
+        if num_lines > max_lines or "__init__.py" in file_name or num_lines <= 1:
             continue
         try:
             tokens = parser.lex(read(file_path) + "\n")
@@ -33,26 +33,41 @@ def get_tokens(directory="references/python-3.0-library", max_lines=50):
     return token_dict
 
 # error adding functions
-def add_single_deletion_error(tokens):
+def add_single_deletion_error(tokens, num_errors=1):
     num_tokens = len(tokens)
     del_index = random.randint(0, num_tokens-1)
 
     return tokens[:del_index] + tokens[del_index+1:]
 
-def add_single_insertion_error(tokens):
+def add_single_insertion_error(tokens, num_errors=1):
     num_tokens = len(tokens)
     insert_index = random.randint(0, num_tokens-1)
     new_token = tokens[random.randint(0, num_tokens-1)]
 
     return tokens[:insert_index] + [new_token] + tokens[insert_index:]
 
+def add_n_deletion_error(tokens, num_errors=3):
+    for _ in range(num_errors):
+        num_tokens = len(tokens)
+        del_index = random.randint(0, num_tokens-1)
+        tokens = tokens[:del_index] + tokens[del_index+1:]
+    return tokens
+
+def add_n_insertion_error(tokens, num_errors=3):
+    for _ in range(num_errors):
+        num_tokens = len(tokens)
+        insert_index = random.randint(0, num_tokens-1)
+        new_token = tokens[random.randint(0, num_tokens-1)]
+        tokens = tokens[:insert_index] + [new_token] + tokens[insert_index:]
+    return tokens
+
 # create error test set with random files in dir
-def create_test_set_randomly(operation, count, token_dict):
+def create_test_set_randomly(operation, count, token_dict, num_errors):
     res = []
     while count != 0:
         file_path = random.choice(list(token_dict.keys()))
         tokens = token_dict[file_path]
-        error_tokens = operation(tokens)
+        error_tokens = operation(tokens, num_errors)
         try:
             parser.parse_from_tokens(error_tokens)
             continue
