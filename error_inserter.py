@@ -61,6 +61,10 @@ def add_n_insertion_error(tokens, num_errors=3):
         tokens = tokens[:insert_index] + [new_token] + tokens[insert_index:]
     return tokens
 
+def add_n_errors(tokens, num_errors=3):
+    ops = [add_n_deletion_error, add_n_insertion_error]
+    return ops[random.randint(0, 1)](tokens, num_errors)
+
 # create error test set with random files in dir
 def create_test_set_randomly(operation, count, token_dict, num_errors):
     res = []
@@ -77,11 +81,11 @@ def create_test_set_randomly(operation, count, token_dict, num_errors):
     return res
 
 # create error test set containing all files in the dir
-def create_test_set_all_files(operation, token_dict):
+def create_test_set_all_files(operation, token_dict, num_errors):
     res = []
     for file_path, tokens in token_dict.items():
         while True:
-            error_tokens = operation(tokens)
+            error_tokens = operation(tokens, num_errors)
             try:
                 parser.parse_from_tokens(error_tokens)
                 continue
