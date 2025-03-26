@@ -2,8 +2,8 @@ from lark.tree import Tree
 
 from cyk_parser import parse
 from symbol import Symbol
-from error_combiners import FrontEndParams
-from utils import get_leaves, save_tree
+from error_combiners import FrontEndDelParams
+from utils import get_leaves, save_tree, trim_nonterminal_leaves
 
 def patience_parse(sentence: str, productions: dict, init_items: list, error_config: dict, hard_limit: int, start_token: str, debug: bool=False, tabs: int=0) -> tuple:
     """
@@ -39,6 +39,19 @@ def patience_parse(sentence: str, productions: dict, init_items: list, error_con
     partial_trees = []
     error_cmp = error_config["error_comparator"]
     error_limit_cmp = error_config["limit_comparator"]
+
+    terminals = set()
+    nonterminals = set()
+    for item in init_items:
+        lhs_sym = item.production.lhs
+        nonterminals.add(lhs_sym)
+        if lhs_sym in terminals:
+            terminals.remove(lhs_sym)
+        rhs_ls = item.production.rhs
+        for rhs in rhs_ls:
+            if rhs not in nonterminals and rhs not in terminals:
+                terminals.add(rhs)
+
     while True:
         sent_len = len(sentence)
         symbol_chart, _ = parse(sentence=sentence, productions=productions, init_items=init_items, error_config=error_config, debug=debug, tabs=tabs)
@@ -46,6 +59,7 @@ def patience_parse(sentence: str, productions: dict, init_items: list, error_con
             # get tree + metric
             error_metric = symbol_chart[0][-1][start_token][0]
             parse_tree = symbol_chart[0][-1][start_token][1]
+            parse_tree = Tree(parse_tree.data, trim_nonterminal_leaves(parse_tree.children, terminals)) # remove nonterminal children
             return partial_trees + [(parse_tree, sentence, "complete parse")]
         else: # unsuccessful parse, set generic tree/metric
             parse_tree = None
@@ -62,7 +76,7 @@ def patience_parse(sentence: str, productions: dict, init_items: list, error_con
                 if start_token in symbol_chart[row][col]:
                     curr_tree = symbol_chart[row][col][start_token][1]
                     curr_symbol = curr_tree.data
-                    params = FrontEndParams(front_deletions=row, end_deletions=(sent_len-col), root_error=curr_symbol.error, parse_tree=curr_tree)
+                    params = FrontEndDelParams(front_deletions=row, end_deletions=(sent_len-col), root_error=curr_symbol.error, parse_tree=curr_tree)
                     new_error = error_config["front_end_del_error_combiner"](params)
                     if (not error_cmp(new_error, error_metric) and not error_limit_cmp(new_error, error_limit)):
                         curr_symbol.error = new_error
@@ -73,6 +87,7 @@ def patience_parse(sentence: str, productions: dict, init_items: list, error_con
                         error_metric = new_error
 
         if parse_tree: # complete parse tree
+            parse_tree = Tree(parse_tree.data, trim_nonterminal_leaves(parse_tree.children, terminals)) # remove nonterminal children
             return partial_trees + [(parse_tree, sentence, "complete parse")]
 
         # no parse tree found, proceed to find parse of largest substring
@@ -93,7 +108,11 @@ def patience_parse(sentence: str, productions: dict, init_items: list, error_con
             # partial parse tree found - edit string and retry
             if parse_tree:
                 # add parse tree to partial trees
-                partial_trees.append((parse_tree, sentence, f"partial parse, {sentence[:start] + '*' + sentence[start:end] + '*' + sentence[end:]}"))
+                parse_tree = Tree(parse_tree.data, trim_nonterminal_leaves(parse_tree.children, terminals)) # remove nonterminal children
+                if isinstance(sentence, str):
+                    partial_trees.append((parse_tree, sentence, f"partial parse, {sentence[:start] + '*' + sentence[start:end] + '*' + sentence[end:]}"))
+                else:
+                    partial_trees.append((parse_tree, sentence))
                 # update input string, should exclude deletions
                 leaves = get_leaves(parse_tree, leaves=[],include_del=False) #
                 if isinstance(sentence, str):

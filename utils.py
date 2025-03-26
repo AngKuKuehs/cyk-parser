@@ -35,6 +35,24 @@ def trim_children(children):
             trimmed_children.append(Tree(curr_val, trim)) # keeps curr value in tree
     return trimmed_children
 
+def trim_nonterminal_leaves(children, terminals):
+    """
+    recursively removes nonterminal leaves from parse tree
+    """
+    trimmed_children = []
+    for tree in children:
+        trim = []
+
+        if tree.children == []:
+            if tree.data not in terminals:
+                continue
+
+        else:
+            trim = trim_nonterminal_leaves(tree.children, terminals)
+
+        trimmed_children.append(Tree(tree.data, trim)) # keeps curr value in tree
+    return trimmed_children
+
 def __strip_token(tkn):
     if isinstance(tkn, Token):
         if tkn.type == "RULE":
@@ -91,8 +109,8 @@ def save_tree(tree, path, text=None):
                     dot.node(str(counter), repr(node_val), style="filled", fillcolor="red")
                 elif node_val.origin == "inserted":
                     dot.node(str(counter), repr(node_val), style="filled", fillcolor="green")
-                elif node_val.origin == "skipped to":
-                    dot.node(str(counter), repr(node_val), style="filled", fillcolor="orange")
+                # elif node_val.origin == "skipped to":
+                #     dot.node(str(counter), repr(node_val), style="filled", fillcolor="orange")
                 elif node_val.origin == "sentence":
                     dot.node(str(counter), repr(node_val), style="filled", fillcolor="grey")
                 else:
@@ -150,3 +168,33 @@ def get_leaves(parse_tree, leaves=None, include_del=True):
             get_leaves(child, leaves, include_del=include_del)
 
     return list(map(lambda sym: sym.value, leaves))
+
+def get_terminals(init_items):
+    terminals = set()
+    nonterminals = set()
+    for item in init_items:
+        lhs_sym = item.production.lhs
+        nonterminals.add(lhs_sym)
+        if lhs_sym in terminals:
+            terminals.remove(lhs_sym)
+        rhs_ls = item.production.rhs
+        for rhs in rhs_ls:
+            if rhs not in nonterminals and rhs not in terminals:
+                terminals.add(rhs)
+
+    return terminals
+
+def get_nonterminals(init_items):
+    terminals = set()
+    nonterminals = set()
+    for item in init_items:
+        lhs_sym = item.production.lhs
+        nonterminals.add(lhs_sym)
+        if lhs_sym in terminals:
+            terminals.remove(lhs_sym)
+        rhs_ls = item.production.rhs
+        for rhs in rhs_ls:
+            if rhs not in nonterminals and rhs not in terminals:
+                terminals.add(rhs)
+
+    return nonterminals
