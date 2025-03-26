@@ -2,7 +2,7 @@ from lark.tree import Tree
 
 from cyk_parser import parse
 from symbol import Symbol
-from error_combiners import FrontEndParams
+from error_combiners import FrontEndDelParams
 
 
 def ec_parse(sentence: str, productions: dict, init_items: list, error_config: dict, hard_limit: int, start_token: str, debug: bool=False, tabs: int=0) -> tuple:
@@ -59,7 +59,7 @@ def ec_parse(sentence: str, productions: dict, init_items: list, error_config: d
                 if start_token in symbol_chart[row][col]:
                     curr_tree = symbol_chart[row][col][start_token][1]
                     curr_symbol = curr_tree.data
-                    params = FrontEndParams(front_deletions=row, end_deletions=(sent_len-col), root_error=curr_symbol.error, parse_tree=curr_tree)
+                    params = FrontEndDelParams(front_deletions=row, end_deletions=(sent_len-col), root_error=curr_symbol.error, parse_tree=curr_tree)
                     new_error = error_config["front_end_del_error_combiner"](params)
                     if not error_cmp(new_error, error_metric) and not error_limit_cmp(new_error, error_limit):
                         curr_symbol.error = new_error

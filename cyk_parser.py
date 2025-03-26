@@ -6,7 +6,7 @@ from item import Item
 from symbol import Symbol
 from production import Production
 from error_config import no_correction_config
-from error_combiners import DelParams, StdParams
+from error_combiners import MidDelParams, StdParams
 
 # CONSTANTS
 make_tree = True
@@ -409,7 +409,7 @@ def fill_rest(n: int, symbol_chart: list, item_chart: list, sentence: list[str],
                             deleted_symbols.append(Tree(data=del_symbol, children=[]))
                         if next_symbol in symbol_cell:
                             assert(symbol_cell[next_symbol][0] == symbol_cell[next_symbol][1].data.error)
-                            params = DelParams(item=item, item_error=item_error, symbol=symbol_cell[next_symbol][1].data, symbol_error=symbol_cell[next_symbol][0], symbol_tree=symbol_cell[next_symbol][1], deletion_count=deletion_count)
+                            params = MidDelParams(item=item, item_error=item_error, symbol=symbol_cell[next_symbol][1].data, symbol_error=symbol_cell[next_symbol][0], symbol_tree=symbol_cell[next_symbol][1], deletion_count=deletion_count)
                             new_item_error = error_config["del_error_combiner"](params)
 
                             if error_config["limit_comparator"](new_error=new_item_error, error_limit=error_config["error_limit"]):
