@@ -10,7 +10,7 @@ def no_correction_config():
         "front_end_del_error_combiner": simple_front_end_del_addition,
         "error_comparator": simple_error_compare,
         "limit_comparator": simple_limit_compare,
-        "init_ins_error": 1, # TODO: when this is 0, error correction still happens for some reason
+        "init_ins_error": 1,
         "init_del_error": 0, # not actually used in error metric calcs since deletions aren't part of the tree
         "error_limit": 0
         }
