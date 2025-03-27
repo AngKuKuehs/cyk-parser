@@ -71,6 +71,8 @@ def create_test_set_randomly(operation, count, token_dict, num_errors):
     while count != 0:
         file_path = random.choice(list(token_dict.keys()))
         tokens = token_dict[file_path]
+        if len(tokens) < num_errors:
+            continue
         error_tokens = operation(tokens, num_errors)
         try:
             parser.parse_from_tokens(error_tokens)
