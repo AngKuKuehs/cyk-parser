@@ -31,6 +31,7 @@ def ec_parse(sentence: str, productions: dict, init_items: list, error_config: d
         parse_tree (Tree) | None : returns a parse tree if a valid parse can be found, None otherwise
     """
     error_config["error_correct"] = True
+    error_config = error_config.copy()
     sent_len = len(sentence)
     error_cmp = error_config["error_comparator"]
     error_limit_cmp = error_config["limit_comparator"]
