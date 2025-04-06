@@ -1,0 +1,518 @@
+// Tree
+digraph {
+	0 [label="Symbol('file_input', 2)"]
+	1 [label="Symbol('__file_input_star_0', 2)"]
+	0 -> 1
+	2 [label="Symbol('__file_input_star_0', 1)"]
+	1 -> 2
+	3 [label="Symbol('stmt', 1)"]
+	1 -> 3
+	4 [label="Symbol('compound_stmt', 1)"]
+	3 -> 4
+	5 [label="Symbol('if_stmt', 1)"]
+	4 -> 5
+	6 [label="Symbol('IF', 0)" fillcolor=grey style=filled]
+	5 -> 6
+	7 [label="Symbol('test', 0)"]
+	5 -> 7
+	8 [label="Symbol('COLON', 0)" fillcolor=grey style=filled]
+	5 -> 8
+	9 [label="Symbol('NAME', 1)" fillcolor=red style=filled]
+	5 -> 9
+	10 [label="Symbol('suite', 0)"]
+	5 -> 10
+	11 [label="Symbol('elifs', 0)"]
+	5 -> 11
+	12 [label="Symbol('()', 0)"]
+	11 -> 12
+	13 [label="Symbol('_NEWLINE', 0)" fillcolor=grey style=filled]
+	10 -> 13
+	14 [label="Symbol('_INDENT', 0)" fillcolor=grey style=filled]
+	10 -> 14
+	15 [label="Symbol('__suite_plus_23', 0)"]
+	10 -> 15
+	16 [label="Symbol('_DEDENT', 0)" fillcolor=grey style=filled]
+	10 -> 16
+	17 [label="Symbol('stmt', 0)"]
+	15 -> 17
+	18 [label="Symbol('simple_stmt', 0)"]
+	17 -> 18
+	19 [label="Symbol('small_stmt', 0)"]
+	18 -> 19
+	20 [label="Symbol('_NEWLINE', 0)" fillcolor=grey style=filled]
+	18 -> 20
+	21 [label="Symbol('expr_stmt', 0)"]
+	19 -> 21
+	22 [label="Symbol('testlist_star_expr', 0)"]
+	21 -> 22
+	23 [label="Symbol('test_or_star_expr', 0)"]
+	22 -> 23
+	24 [label="Symbol('test', 0)"]
+	23 -> 24
+	25 [label="Symbol('or_test', 0)"]
+	24 -> 25
+	26 [label="Symbol('and_test', 0)"]
+	25 -> 26
+	27 [label="Symbol('not_test_', 0)"]
+	26 -> 27
+	28 [label="Symbol('comparison', 0)"]
+	27 -> 28
+	29 [label="Symbol('expr', 0)"]
+	28 -> 29
+	30 [label="Symbol('or_expr', 0)"]
+	29 -> 30
+	31 [label="Symbol('xor_expr', 0)"]
+	30 -> 31
+	32 [label="Symbol('and_expr', 0)"]
+	31 -> 32
+	33 [label="Symbol('shift_expr', 0)"]
+	32 -> 33
+	34 [label="Symbol('arith_expr', 0)"]
+	33 -> 34
+	35 [label="Symbol('term', 0)"]
+	34 -> 35
+	36 [label="Symbol('factor', 0)"]
+	35 -> 36
+	37 [label="Symbol('power', 0)"]
+	36 -> 37
+	38 [label="Symbol('await_expr', 0)"]
+	37 -> 38
+	39 [label="Symbol('atom_expr', 0)"]
+	38 -> 39
+	40 [label="Symbol('atom_expr', 0)"]
+	39 -> 40
+	41 [label="Symbol('LPAR', 0)" fillcolor=grey style=filled]
+	39 -> 41
+	42 [label="Symbol('RPAR', 0)" fillcolor=grey style=filled]
+	39 -> 42
+	43 [label="Symbol('atom', 0)"]
+	40 -> 43
+	44 [label="Symbol('name', 0)"]
+	43 -> 44
+	45 [label="Symbol('NAME', 0)" fillcolor=grey style=filled]
+	44 -> 45
+	46 [label="Symbol('or_test', 0)"]
+	7 -> 46
+	47 [label="Symbol('and_test', 0)"]
+	46 -> 47
+	48 [label="Symbol('not_test_', 0)"]
+	47 -> 48
+	49 [label="Symbol('comparison', 0)"]
+	48 -> 49
+	50 [label="Symbol('expr', 0)"]
+	49 -> 50
+	51 [label="Symbol('__comparison_star_26', 0)"]
+	49 -> 51
+	52 [label="Symbol('comp_op', 0)"]
+	51 -> 52
+	53 [label="Symbol('expr', 0)"]
+	51 -> 53
+	54 [label="Symbol('or_expr', 0)"]
+	53 -> 54
+	55 [label="Symbol('xor_expr', 0)"]
+	54 -> 55
+	56 [label="Symbol('and_expr', 0)"]
+	55 -> 56
+	57 [label="Symbol('shift_expr', 0)"]
+	56 -> 57
+	58 [label="Symbol('arith_expr', 0)"]
+	57 -> 58
+	59 [label="Symbol('term', 0)"]
+	58 -> 59
+	60 [label="Symbol('factor', 0)"]
+	59 -> 60
+	61 [label="Symbol('power', 0)"]
+	60 -> 61
+	62 [label="Symbol('await_expr', 0)"]
+	61 -> 62
+	63 [label="Symbol('atom_expr', 0)"]
+	62 -> 63
+	64 [label="Symbol('atom', 0)"]
+	63 -> 64
+	65 [label="Symbol('string_concat', 0)"]
+	64 -> 65
+	66 [label="Symbol('__string_concat_plus_33', 0)"]
+	65 -> 66
+	67 [label="Symbol('string', 0)"]
+	66 -> 67
+	68 [label="Symbol('STRING', 0)" fillcolor=grey style=filled]
+	67 -> 68
+	69 [label="Symbol('__ANON_19', 0)" fillcolor=grey style=filled]
+	52 -> 69
+	70 [label="Symbol('or_expr', 0)"]
+	50 -> 70
+	71 [label="Symbol('xor_expr', 0)"]
+	70 -> 71
+	72 [label="Symbol('and_expr', 0)"]
+	71 -> 72
+	73 [label="Symbol('shift_expr', 0)"]
+	72 -> 73
+	74 [label="Symbol('arith_expr', 0)"]
+	73 -> 74
+	75 [label="Symbol('term', 0)"]
+	74 -> 75
+	76 [label="Symbol('factor', 0)"]
+	75 -> 76
+	77 [label="Symbol('power', 0)"]
+	76 -> 77
+	78 [label="Symbol('await_expr', 0)"]
+	77 -> 78
+	79 [label="Symbol('atom_expr', 0)"]
+	78 -> 79
+	80 [label="Symbol('atom', 0)"]
+	79 -> 80
+	81 [label="Symbol('name', 0)"]
+	80 -> 81
+	82 [label="Symbol('NAME', 0)" fillcolor=grey style=filled]
+	81 -> 82
+	83 [label="Symbol('__file_input_star_0', 1)"]
+	2 -> 83
+	84 [label="Symbol('stmt', 0)"]
+	2 -> 84
+	85 [label="Symbol('compound_stmt', 0)"]
+	84 -> 85
+	86 [label="Symbol('funcdef', 0)"]
+	85 -> 86
+	87 [label="Symbol('DEF', 0)" fillcolor=grey style=filled]
+	86 -> 87
+	88 [label="Symbol('name', 0)"]
+	86 -> 88
+	89 [label="Symbol('LPAR', 0)" fillcolor=grey style=filled]
+	86 -> 89
+	90 [label="Symbol('RPAR', 0)" fillcolor=grey style=filled]
+	86 -> 90
+	91 [label="Symbol('COLON', 0)" fillcolor=grey style=filled]
+	86 -> 91
+	92 [label="Symbol('suite', 0)"]
+	86 -> 92
+	93 [label="Symbol('_NEWLINE', 0)" fillcolor=grey style=filled]
+	92 -> 93
+	94 [label="Symbol('_INDENT', 0)" fillcolor=grey style=filled]
+	92 -> 94
+	95 [label="Symbol('__suite_plus_23', 0)"]
+	92 -> 95
+	96 [label="Symbol('_DEDENT', 0)" fillcolor=grey style=filled]
+	92 -> 96
+	97 [label="Symbol('stmt', 0)"]
+	95 -> 97
+	98 [label="Symbol('simple_stmt', 0)"]
+	97 -> 98
+	99 [label="Symbol('small_stmt', 0)"]
+	98 -> 99
+	100 [label="Symbol('_NEWLINE', 0)" fillcolor=grey style=filled]
+	98 -> 100
+	101 [label="Symbol('expr_stmt', 0)"]
+	99 -> 101
+	102 [label="Symbol('testlist_star_expr', 0)"]
+	101 -> 102
+	103 [label="Symbol('test_or_star_expr', 0)"]
+	102 -> 103
+	104 [label="Symbol('test', 0)"]
+	103 -> 104
+	105 [label="Symbol('or_test', 0)"]
+	104 -> 105
+	106 [label="Symbol('and_test', 0)"]
+	105 -> 106
+	107 [label="Symbol('not_test_', 0)"]
+	106 -> 107
+	108 [label="Symbol('comparison', 0)"]
+	107 -> 108
+	109 [label="Symbol('expr', 0)"]
+	108 -> 109
+	110 [label="Symbol('or_expr', 0)"]
+	109 -> 110
+	111 [label="Symbol('xor_expr', 0)"]
+	110 -> 111
+	112 [label="Symbol('and_expr', 0)"]
+	111 -> 112
+	113 [label="Symbol('shift_expr', 0)"]
+	112 -> 113
+	114 [label="Symbol('arith_expr', 0)"]
+	113 -> 114
+	115 [label="Symbol('term', 0)"]
+	114 -> 115
+	116 [label="Symbol('factor', 0)"]
+	115 -> 116
+	117 [label="Symbol('power', 0)"]
+	116 -> 117
+	118 [label="Symbol('await_expr', 0)"]
+	117 -> 118
+	119 [label="Symbol('atom_expr', 0)"]
+	118 -> 119
+	120 [label="Symbol('atom_expr', 0)"]
+	119 -> 120
+	121 [label="Symbol('LPAR', 0)" fillcolor=grey style=filled]
+	119 -> 121
+	122 [label="Symbol('arguments', 0)"]
+	119 -> 122
+	123 [label="Symbol('RPAR', 0)" fillcolor=grey style=filled]
+	119 -> 123
+	124 [label="Symbol('argvalue', 0)"]
+	122 -> 124
+	125 [label="Symbol('test', 0)"]
+	124 -> 125
+	126 [label="Symbol('or_test', 0)"]
+	125 -> 126
+	127 [label="Symbol('and_test', 0)"]
+	126 -> 127
+	128 [label="Symbol('not_test_', 0)"]
+	127 -> 128
+	129 [label="Symbol('comparison', 0)"]
+	128 -> 129
+	130 [label="Symbol('expr', 0)"]
+	129 -> 130
+	131 [label="Symbol('or_expr', 0)"]
+	130 -> 131
+	132 [label="Symbol('xor_expr', 0)"]
+	131 -> 132
+	133 [label="Symbol('and_expr', 0)"]
+	132 -> 133
+	134 [label="Symbol('shift_expr', 0)"]
+	133 -> 134
+	135 [label="Symbol('arith_expr', 0)"]
+	134 -> 135
+	136 [label="Symbol('term', 0)"]
+	135 -> 136
+	137 [label="Symbol('factor', 0)"]
+	136 -> 137
+	138 [label="Symbol('power', 0)"]
+	137 -> 138
+	139 [label="Symbol('await_expr', 0)"]
+	138 -> 139
+	140 [label="Symbol('atom_expr', 0)"]
+	139 -> 140
+	141 [label="Symbol('atom_expr', 0)"]
+	140 -> 141
+	142 [label="Symbol('LPAR', 0)" fillcolor=grey style=filled]
+	140 -> 142
+	143 [label="Symbol('RPAR', 0)" fillcolor=grey style=filled]
+	140 -> 143
+	144 [label="Symbol('atom_expr', 0)"]
+	141 -> 144
+	145 [label="Symbol('DOT', 0)" fillcolor=grey style=filled]
+	141 -> 145
+	146 [label="Symbol('name', 0)"]
+	141 -> 146
+	147 [label="Symbol('NAME', 0)" fillcolor=grey style=filled]
+	146 -> 147
+	148 [label="Symbol('atom_expr', 0)"]
+	144 -> 148
+	149 [label="Symbol('DOT', 0)" fillcolor=grey style=filled]
+	144 -> 149
+	150 [label="Symbol('name', 0)"]
+	144 -> 150
+	151 [label="Symbol('NAME', 0)" fillcolor=grey style=filled]
+	150 -> 151
+	152 [label="Symbol('atom', 0)"]
+	148 -> 152
+	153 [label="Symbol('name', 0)"]
+	152 -> 153
+	154 [label="Symbol('NAME', 0)" fillcolor=grey style=filled]
+	153 -> 154
+	155 [label="Symbol('atom_expr', 0)"]
+	120 -> 155
+	156 [label="Symbol('DOT', 0)" fillcolor=grey style=filled]
+	120 -> 156
+	157 [label="Symbol('name', 0)"]
+	120 -> 157
+	158 [label="Symbol('NAME', 0)" fillcolor=grey style=filled]
+	157 -> 158
+	159 [label="Symbol('atom_expr', 0)"]
+	155 -> 159
+	160 [label="Symbol('DOT', 0)" fillcolor=grey style=filled]
+	155 -> 160
+	161 [label="Symbol('name', 0)"]
+	155 -> 161
+	162 [label="Symbol('NAME', 0)" fillcolor=grey style=filled]
+	161 -> 162
+	163 [label="Symbol('atom', 0)"]
+	159 -> 163
+	164 [label="Symbol('name', 0)"]
+	163 -> 164
+	165 [label="Symbol('NAME', 0)" fillcolor=grey style=filled]
+	164 -> 165
+	166 [label="Symbol('NAME', 0)" fillcolor=grey style=filled]
+	88 -> 166
+	167 [label="Symbol('__file_input_star_0', 1)"]
+	83 -> 167
+	168 [label="Symbol('stmt', 0)"]
+	83 -> 168
+	169 [label="Symbol('simple_stmt', 0)"]
+	168 -> 169
+	170 [label="Symbol('small_stmt', 0)"]
+	169 -> 170
+	171 [label="Symbol('_NEWLINE', 0)" fillcolor=grey style=filled]
+	169 -> 171
+	172 [label="Symbol('expr_stmt', 0)"]
+	170 -> 172
+	173 [label="Symbol('testlist_star_expr', 0)"]
+	172 -> 173
+	174 [label="Symbol('test_or_star_expr', 0)"]
+	173 -> 174
+	175 [label="Symbol('test', 0)"]
+	174 -> 175
+	176 [label="Symbol('or_test', 0)"]
+	175 -> 176
+	177 [label="Symbol('and_test', 0)"]
+	176 -> 177
+	178 [label="Symbol('not_test_', 0)"]
+	177 -> 178
+	179 [label="Symbol('comparison', 0)"]
+	178 -> 179
+	180 [label="Symbol('expr', 0)"]
+	179 -> 180
+	181 [label="Symbol('or_expr', 0)"]
+	180 -> 181
+	182 [label="Symbol('xor_expr', 0)"]
+	181 -> 182
+	183 [label="Symbol('and_expr', 0)"]
+	182 -> 183
+	184 [label="Symbol('shift_expr', 0)"]
+	183 -> 184
+	185 [label="Symbol('arith_expr', 0)"]
+	184 -> 185
+	186 [label="Symbol('term', 0)"]
+	185 -> 186
+	187 [label="Symbol('factor', 0)"]
+	186 -> 187
+	188 [label="Symbol('power', 0)"]
+	187 -> 188
+	189 [label="Symbol('await_expr', 0)"]
+	188 -> 189
+	190 [label="Symbol('atom_expr', 0)"]
+	189 -> 190
+	191 [label="Symbol('atom_expr', 0)"]
+	190 -> 191
+	192 [label="Symbol('DOT', 0)" fillcolor=grey style=filled]
+	190 -> 192
+	193 [label="Symbol('name', 0)"]
+	190 -> 193
+	194 [label="Symbol('NAME', 0)" fillcolor=grey style=filled]
+	193 -> 194
+	195 [label="Symbol('atom', 0)"]
+	191 -> 195
+	196 [label="Symbol('name', 0)"]
+	195 -> 196
+	197 [label="Symbol('NAME', 0)" fillcolor=grey style=filled]
+	196 -> 197
+	198 [label="Symbol('__file_input_star_0', 0)"]
+	167 -> 198
+	199 [label="Symbol('stmt', 1)"]
+	167 -> 199
+	200 [label="Symbol('simple_stmt', 1)"]
+	199 -> 200
+	201 [label="Symbol('small_stmt', 0)"]
+	200 -> 201
+	202 [label="Symbol('_NEWLINE', 1)" fillcolor=green style=filled]
+	200 -> 202
+	203 [label="Symbol('import_stmt', 0)"]
+	201 -> 203
+	204 [label="Symbol('import_name', 0)"]
+	203 -> 204
+	205 [label="Symbol('IMPORT', 0)" fillcolor=grey style=filled]
+	204 -> 205
+	206 [label="Symbol('dotted_as_names', 0)"]
+	204 -> 206
+	207 [label="Symbol('dotted_as_name', 0)"]
+	206 -> 207
+	208 [label="Symbol('dotted_name', 0)"]
+	207 -> 208
+	209 [label="Symbol('name', 0)"]
+	208 -> 209
+	210 [label="Symbol('NAME', 0)" fillcolor=grey style=filled]
+	209 -> 210
+	211 [label="Symbol('__file_input_star_0', 0)"]
+	198 -> 211
+	212 [label="Symbol('_NEWLINE', 0)" fillcolor=grey style=filled]
+	198 -> 212
+	213 [label="Symbol('__file_input_star_0', 0)"]
+	211 -> 213
+	214 [label="Symbol('stmt', 0)"]
+	211 -> 214
+	215 [label="Symbol('simple_stmt', 0)"]
+	214 -> 215
+	216 [label="Symbol('small_stmt', 0)"]
+	215 -> 216
+	217 [label="Symbol('_NEWLINE', 0)" fillcolor=grey style=filled]
+	215 -> 217
+	218 [label="Symbol('import_stmt', 0)"]
+	216 -> 218
+	219 [label="Symbol('import_name', 0)"]
+	218 -> 219
+	220 [label="Symbol('IMPORT', 0)" fillcolor=grey style=filled]
+	219 -> 220
+	221 [label="Symbol('dotted_as_names', 0)"]
+	219 -> 221
+	222 [label="Symbol('dotted_as_name', 0)"]
+	221 -> 222
+	223 [label="Symbol('dotted_name', 0)"]
+	222 -> 223
+	224 [label="Symbol('name', 0)"]
+	223 -> 224
+	225 [label="Symbol('__dotted_name_star_11', 0)"]
+	223 -> 225
+	226 [label="Symbol('DOT', 0)" fillcolor=grey style=filled]
+	225 -> 226
+	227 [label="Symbol('name', 0)"]
+	225 -> 227
+	228 [label="Symbol('NAME', 0)" fillcolor=grey style=filled]
+	227 -> 228
+	229 [label="Symbol('NAME', 0)" fillcolor=grey style=filled]
+	224 -> 229
+	230 [label="Symbol('stmt', 0)"]
+	213 -> 230
+	231 [label="Symbol('simple_stmt', 0)"]
+	230 -> 231
+	232 [label="Symbol('small_stmt', 0)"]
+	231 -> 232
+	233 [label="Symbol('_NEWLINE', 0)" fillcolor=grey style=filled]
+	231 -> 233
+	234 [label="Symbol('expr_stmt', 0)"]
+	232 -> 234
+	235 [label="Symbol('testlist_star_expr', 0)"]
+	234 -> 235
+	236 [label="Symbol('test_or_star_expr', 0)"]
+	235 -> 236
+	237 [label="Symbol('test', 0)"]
+	236 -> 237
+	238 [label="Symbol('or_test', 0)"]
+	237 -> 238
+	239 [label="Symbol('and_test', 0)"]
+	238 -> 239
+	240 [label="Symbol('not_test_', 0)"]
+	239 -> 240
+	241 [label="Symbol('comparison', 0)"]
+	240 -> 241
+	242 [label="Symbol('expr', 0)"]
+	241 -> 242
+	243 [label="Symbol('or_expr', 0)"]
+	242 -> 243
+	244 [label="Symbol('xor_expr', 0)"]
+	243 -> 244
+	245 [label="Symbol('and_expr', 0)"]
+	244 -> 245
+	246 [label="Symbol('shift_expr', 0)"]
+	245 -> 246
+	247 [label="Symbol('arith_expr', 0)"]
+	246 -> 247
+	248 [label="Symbol('term', 0)"]
+	247 -> 248
+	249 [label="Symbol('factor', 0)"]
+	248 -> 249
+	250 [label="Symbol('power', 0)"]
+	249 -> 250
+	251 [label="Symbol('await_expr', 0)"]
+	250 -> 251
+	252 [label="Symbol('atom_expr', 0)"]
+	251 -> 252
+	253 [label="Symbol('atom', 0)"]
+	252 -> 253
+	254 [label="Symbol('string_concat', 0)"]
+	253 -> 254
+	255 [label="Symbol('__string_concat_plus_33', 0)"]
+	254 -> 255
+	256 [label="Symbol('string', 0)"]
+	255 -> 256
+	257 [label="Symbol('LONG_STRING', 0)" fillcolor=grey style=filled]
+	256 -> 257
+}
