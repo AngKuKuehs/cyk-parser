@@ -1,0 +1,6 @@
+{
+    "Start" : [["subj", "verb", "obj"]],
+    "subj": [["I"]],
+    "verb": [["eat"]],
+    "obj": [["cake"]]
+}
