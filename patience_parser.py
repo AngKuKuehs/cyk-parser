@@ -3,7 +3,7 @@ from lark.tree import Tree
 from cyk_parser import parse
 from symbol import Symbol
 from error_combiners import FrontEndDelParams
-from utils import get_leaves, save_tree, trim_nonterminal_leaves
+from utils import get_leaves, trim_nonterminal_leaves
 
 def patience_parse(sentence: str, productions: dict, init_items: list, error_config: dict, hard_limit: int, start_token: str, debug: bool=False, tabs: int=0) -> tuple:
     """

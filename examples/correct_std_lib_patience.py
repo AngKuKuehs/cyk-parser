@@ -2,8 +2,7 @@ import time
 
 from utils import *
 from error_inserter import load_error_file
-from cyk_parser import load_productions_from_json, parse
-from error_parser import ec_parse
+from cyk_parser import load_productions_from_json
 from patience_parser import patience_parse
 from lark_parser import LarkParser
 

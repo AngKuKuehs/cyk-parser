@@ -1,5 +1,4 @@
 import item
-from symbol import Symbol
 
 class Production():
     def __init__(self, lhs: str, rhs: list[str], name=None):

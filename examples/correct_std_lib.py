@@ -4,7 +4,6 @@ from utils import *
 from error_inserter import load_error_file
 from cyk_parser import load_productions_from_json
 from lark_parser import LarkParser
-from patience_parser import patience_parse
 from error_parser import ec_parse
 
 from error_config import custom_cost_correction_config
@@ -34,8 +33,7 @@ for tp in rnd_files:
         metric = res.data.error
         lark_tree = lparser.parse(read(tp[0]))
         trees_eq = "true" if lark_tree == res else "false"
-
-        save_tree(res, f"{tp[0]}--tree")
+        # save_tree(res, f"outputs/trees/correct_std_lib_cyk/{tp[0]}--tree")
 
     else:
         succ = "false"

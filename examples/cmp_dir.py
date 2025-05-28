@@ -1,4 +1,3 @@
-import os
 import time
 
 from cyk_parser import load_productions_from_json, parse
