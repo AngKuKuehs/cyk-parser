@@ -8,7 +8,7 @@ bracket_productions, bracket_init_items = load_productions_from_json("grammars/s
 # productions_5, init_items_5 = load_productions_from_json("grammars/test.json", debug=False)
 
 # error_config = basic_correction_config(error_limit=5)
-error_config = custom_cost_correction_config(error_limit=2, deletion_cost=2, insertion_cost=1)
+error_config = custom_cost_correction_config(error_limit=2, deletion_cost=1, insertion_cost=1)
 
 def test_patience_correction():
     cyk_tree = patience_parse("()", bracket_productions, bracket_init_items, error_config=error_config, hard_limit=5, start_token="Start", debug=False)
