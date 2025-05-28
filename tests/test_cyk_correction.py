@@ -14,7 +14,7 @@ def test_cyk_correction():
     assert "Start" in symbol_chart[0][-1]
     cyk_tree = symbol_chart[0][-1]["Start"][1]
     cyk_tree = Tree(cyk_tree.data, trim_children(cyk_tree.children))
-    save_tree(cyk_tree, path=f"./outputs/trees/test_correction_brackets/1-1_tree")
+    save_tree(cyk_tree, path=f"./outputs/trees/test_correction_brackets/1_tree")
 
     symbol_chart = parse("[))]", productions_4, init_items_4, error_config=error_config, debug=False)[0]
     assert "Start" in symbol_chart[0][-1]
@@ -26,24 +26,24 @@ def test_cyk_correction():
     assert "Start" in symbol_chart[0][-1]
     cyk_tree = symbol_chart[0][-1]["Start"][1]
     cyk_tree = Tree(cyk_tree.data, trim_children(cyk_tree.children))
-    save_tree(cyk_tree, path=f"./outputs/trees/test_correction_brackets/3-1_tree")
+    save_tree(cyk_tree, path=f"./outputs/trees/test_correction_brackets/3_tree")
 
     symbol_chart = parse(")", productions_4, init_items_4, error_config=error_config, debug=False)[0]
     assert "Start" in symbol_chart[0][-1]
     cyk_tree = symbol_chart[0][-1]["Start"][1]
     cyk_tree = Tree(cyk_tree.data, trim_children(cyk_tree.children))
-    save_tree(cyk_tree, path=f"./outputs/trees/test_correction_brackets/4-1_tree")
+    save_tree(cyk_tree, path=f"./outputs/trees/test_correction_brackets/4_tree")
 
     symbol_chart, _ = parse("", productions_4, init_items_4, error_config=error_config, debug=False)
     assert "Start" in symbol_chart[0][-1]
     cyk_tree = symbol_chart[0][-1]["Start"][1]
     cyk_tree = Tree(cyk_tree.data, trim_children(cyk_tree.children))
-    save_tree(cyk_tree, path=f"./outputs/trees/test_correction_brackets/5-1_tree")
+    save_tree(cyk_tree, path=f"./outputs/trees/test_correction_brackets/5_tree")
 
     symbol_chart, _ = parse(")()", productions_4, init_items_4, error_config=error_config, debug=False)
     assert "Start" in symbol_chart[0][-1]
     cyk_tree = symbol_chart[0][-1]["Start"][1]
     cyk_tree = Tree(cyk_tree.data, trim_children(cyk_tree.children))
-    save_tree(cyk_tree, path=f"./outputs/trees/test_correction_brackets/6-1_tree")
+    save_tree(cyk_tree, path=f"./outputs/trees/test_correction_brackets/6_tree")
 
 test_cyk_correction()

@@ -11,17 +11,6 @@ parser = LarkParser()
 
 python_productions, init_items_python = load_productions_from_json("grammars/python.json", debug=False)
 
-error_config = {
-    "error_correct": False,
-    "init_error": 0,
-    "del_error_combiner": simple_del_addition,
-    "ins_error_combiner": simple_ins_addition,
-    "std_error_combiner": simple_std_addition,
-    "init_ins_error": 0,
-    "init_del_error": 0,
-    "error_limit": 0
-}
-
 # generate parse trees for python std library
 def cmp_file(file_path):
     file_name = file_path.split("/")[-1][:-3]
@@ -48,7 +37,7 @@ def cmp_file(file_path):
         tokens = convert_lark_tokens_for_cyk(parser.lex(read(file_path) + "\n"))
 
         cyk_start = time.time()
-        symbol_chart, _ = parse(tokens, python_productions, init_items_python, error_config=error_config)
+        symbol_chart, _ = parse(tokens, python_productions, init_items_python)
         cyk_end = time.time()
         print(f"cyk parsed in {cyk_end - cyk_start}")
 

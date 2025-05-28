@@ -19,14 +19,13 @@ def cmp_dir(directory):
     print(",".join(["file", "num lines", "lark time", "cyk time", "num tokens", "trees equal"]))
     files = get_files_from_dir(directory)
     for file_name, file_path, num_lines in files:
-            if num_lines > 20:
+            if num_lines > 200:
                 continue
             entry = [file_path, f"{num_lines}"] # file path, num lines
 
             # generate tree from lark
             lark_tree = None
             try:
-
                 lark_start = time.time()
                 lark_tree = parser.parse(read(file_path) + "\n")
                 lark_end = time.time()
@@ -55,7 +54,6 @@ def cmp_dir(directory):
                 save_tree(cyk_tree, path=f"./outputs/trees/tmp/{file_name[:-3]}_tree")
             except Exception as e:
                 continue
-                # print(f"cyk: {file_name} failed: {e}")
 
             # check if trees are equal
             if lark_tree == cyk_tree:
