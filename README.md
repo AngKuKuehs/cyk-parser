@@ -7,7 +7,7 @@ General steps to use parsers:
 <li>Instatiate a config object for the parser.</li>
 <li>Load initial items and productions from relevant grammar.</li>
 <li>Load file and convert file into a string of tokens OR instantiate sentence.</li>
-<li>Call `parse` from cyk_parser.py with relevant arguments.</li>
+<li>Call relevant `parse` function.</li>
 <li>Save parse tree from symbol chart OR save parse tree.</li>
 </ol>
 
