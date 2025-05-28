@@ -3,7 +3,7 @@ Python Implementation of error-correcting CYK parsers with items and error metri
 
 ## Parsers
 ### CYK Parser
-An CYK parser that returns a symbol chart and an item chart.
+A CYK parser that returns a symbol chart and an item chart.
 
 Parse trees associated with each symbol can be found alongside the symbol in the symbol chart.
 
